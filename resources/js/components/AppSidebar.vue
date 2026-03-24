@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
 import {
-    BookOpen,
-    FolderGit2,
+    LayoutDashboard,
+    User,
     UserCog,
     UserRound,
     ShieldCheck,
 } from 'lucide-vue-next';
+import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -20,43 +21,48 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import * as Managers from '@/routes/managers';
+import * as Receptionists from '@/routes/receptionists';
 import type { NavItem } from '@/types';
 import { dashboard } from '@/routes';
-import {
-    manageClients,
-    manageManagers,
-    manageReceptionists,
-} from '@/routes/dashboard';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Manage Managers',
-        href: manageManagers(),
-        icon: ShieldCheck,
-    },
-    {
-        title: 'Manage Receptionists',
-        href: manageReceptionists(),
-        icon: UserCog,
-    },
-    {
+const page = usePage<{ auth: { user: { roles: string[] } } }>();
+const roles = computed(() => page.props.auth.user?.roles ?? []);
+const isAdmin = computed(() => roles.value.includes('admin'));
+const isManager = computed(() => roles.value.includes('manager'));
+
+const mainNavItems = computed<NavItem[]>(() => {
+    const items: NavItem[] = [
+        { title: 'Dashboard', href: dashboard(), icon: LayoutDashboard },
+    ];
+
+    if (isAdmin.value) {
+        items.push({
+            title: 'Manage Managers',
+            href: Managers.index.url(),
+            icon: ShieldCheck,
+        });
+    }
+
+    if (isAdmin.value || isManager.value) {
+        items.push({
+            title: 'Manage Receptionists',
+            href: Receptionists.index.url(),
+            icon: UserCog,
+        });
+    }
+
+    items.push({
         title: 'Manage Clients',
-        href: manageClients(),
+        href: '/dashboard/manage-clients',
         icon: UserRound,
-    },
-];
+    });
+
+    return items;
+});
 
 const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/vue-starter-kit',
-        icon: FolderGit2,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#vue',
-        icon: BookOpen,
-    },
+    { title: 'My Profile', href: '/dashboard/profile', icon: User },
 ];
 </script>
 

@@ -57,4 +57,24 @@ class UserFactory extends Factory
             'two_factor_confirmed_at' => now(),
         ]);
     }
+
+    /** State for a manager user. */
+    public function manager(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'national_id' => fake()->unique()->numerify('##########'),
+            'avatar_image' => null,
+            'created_by'   => null,
+        ]);
+    }
+
+    /** State for a receptionist user, optionally tied to a manager. */
+    public function receptionist(?int $createdBy = null): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'national_id' => fake()->unique()->numerify('##########'),
+            'avatar_image' => null,
+            'created_by'   => $createdBy,
+        ]);
+    }
 }

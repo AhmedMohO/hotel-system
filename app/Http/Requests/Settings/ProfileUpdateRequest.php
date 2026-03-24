@@ -17,6 +17,9 @@ class ProfileUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
-        return $this->profileRules($this->user()->id);
+        return array_merge($this->profileRules($this->user()->id), [
+            'avatar_image' => ['nullable', 'image', 'mimes:jpg,jpeg', 'max:2048'],
+            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+        ]);
     }
 }

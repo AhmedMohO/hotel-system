@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { Form, Head, Link, usePage } from '@inertiajs/vue3';
+import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
-import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
+import AvatarUpload from '@/components/AvatarUpload.vue';
 import DeleteUser from '@/components/DeleteUser.vue';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
@@ -22,62 +22,90 @@ type Props = {
 defineProps<Props>();
 
 const breadcrumbItems: BreadcrumbItem[] = [
-    {
-        title: 'Profile settings',
-        href: edit(),
-    },
+    { title: 'Profile settings', href: edit() },
 ];
 
-const page = usePage();
+const page = usePage<{
+    auth: {
+        user: { name: string; email: string; avatar_image: string | null };
+    };
+}>();
 const user = computed(() => page.props.auth.user);
+
+// Separate form for avatar + password (requires multipart)
+const avatarForm = useForm({
+    name: user.value.name,
+    email: user.value.email,
+    avatar_image: null as File | null,
+    password: '',
+    password_confirmation: '',
+});
+
+function submitAvatar() {
+    avatarForm
+        .transform((data) => ({ ...data, _method: 'PATCH' }))
+        .post('/settings/profile', {
+            forceFormData: true,
+            onSuccess: () => {
+                avatarForm.password = '';
+                avatarForm.password_confirmation = '';
+                avatarForm.avatar_image = null;
+            },
+        });
+}
 </script>
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbItems">
         <Head title="Profile settings" />
-
         <h1 class="sr-only">Profile settings</h1>
 
         <SettingsLayout>
             <div class="flex flex-col space-y-6">
+                <!-- Avatar + Name + Email + Password (multipart form) -->
                 <Heading
                     variant="small"
                     title="Profile information"
-                    description="Update your name and email address"
+                    description="Update your name, email address, profile picture, and password"
                 />
 
-                <Form
-                    v-bind="ProfileController.update.form()"
-                    class="space-y-6"
-                    v-slot="{ errors, processing, recentlySuccessful }"
-                >
+                <form class="space-y-6" @submit.prevent="submitAvatar">
+                    <!-- Avatar -->
+                    <AvatarUpload
+                        v-model="avatarForm.avatar_image"
+                        :current-avatar="user.avatar_image"
+                        :error="avatarForm.errors.avatar_image"
+                    />
+
                     <div class="grid gap-2">
                         <Label for="name">Name</Label>
                         <Input
                             id="name"
+                            v-model="avatarForm.name"
                             class="mt-1 block w-full"
-                            name="name"
-                            :default-value="user.name"
-                            required
                             autocomplete="name"
                             placeholder="Full name"
                         />
-                        <InputError class="mt-2" :message="errors.name" />
+                        <InputError
+                            class="mt-2"
+                            :message="avatarForm.errors.name"
+                        />
                     </div>
 
                     <div class="grid gap-2">
                         <Label for="email">Email address</Label>
                         <Input
                             id="email"
+                            v-model="avatarForm.email"
                             type="email"
                             class="mt-1 block w-full"
-                            name="email"
-                            :default-value="user.email"
-                            required
                             autocomplete="username"
                             placeholder="Email address"
                         />
-                        <InputError class="mt-2" :message="errors.email" />
+                        <InputError
+                            class="mt-2"
+                            :message="avatarForm.errors.email"
+                        />
                     </div>
 
                     <div v-if="mustVerifyEmail && !user.email_verified_at">
@@ -91,7 +119,6 @@ const user = computed(() => page.props.auth.user);
                                 Click here to resend the verification email.
                             </Link>
                         </p>
-
                         <div
                             v-if="status === 'verification-link-sent'"
                             class="mt-2 text-sm font-medium text-green-600"
@@ -101,13 +128,45 @@ const user = computed(() => page.props.auth.user);
                         </div>
                     </div>
 
+                    <div class="grid gap-2">
+                        <Label for="password"
+                            >New Password
+                            <span class="text-xs text-muted-foreground"
+                                >(leave blank to keep current)</span
+                            ></Label
+                        >
+                        <Input
+                            id="password"
+                            v-model="avatarForm.password"
+                            type="password"
+                            class="mt-1 block w-full"
+                            autocomplete="new-password"
+                        />
+                        <InputError
+                            class="mt-2"
+                            :message="avatarForm.errors.password"
+                        />
+                    </div>
+
+                    <div class="grid gap-2">
+                        <Label for="password_confirmation"
+                            >Confirm New Password</Label
+                        >
+                        <Input
+                            id="password_confirmation"
+                            v-model="avatarForm.password_confirmation"
+                            type="password"
+                            class="mt-1 block w-full"
+                            autocomplete="new-password"
+                        />
+                    </div>
+
                     <div class="flex items-center gap-4">
                         <Button
-                            :disabled="processing"
+                            :disabled="avatarForm.processing"
                             data-test="update-profile-button"
                             >Save</Button
                         >
-
                         <Transition
                             enter-active-class="transition ease-in-out"
                             enter-from-class="opacity-0"
@@ -115,14 +174,14 @@ const user = computed(() => page.props.auth.user);
                             leave-to-class="opacity-0"
                         >
                             <p
-                                v-show="recentlySuccessful"
+                                v-show="avatarForm.recentlySuccessful"
                                 class="text-sm text-neutral-600"
                             >
                                 Saved.
                             </p>
                         </Transition>
                     </div>
-                </Form>
+                </form>
             </div>
 
             <DeleteUser />

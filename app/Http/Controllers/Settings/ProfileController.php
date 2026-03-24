@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Settings;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\ProfileDeleteRequest;
 use App\Http\Requests\Settings\ProfileUpdateRequest;
+use App\Services\AvatarService;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -14,29 +15,47 @@ use Inertia\Response;
 
 class ProfileController extends Controller
 {
+    public function __construct(private readonly AvatarService $avatarService) {}
+
     /**
      * Show the user's profile settings page.
      */
     public function edit(Request $request): Response
     {
-        return Inertia::render('settings/Profile', [
+        return Inertia::render('Dashboard/Profile/Edit', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => $request->session()->get('status'),
         ]);
     }
 
     /**
-     * Update the user's profile information.
+     * Update the user's profile information (name, email, avatar, password).
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        /** @var \App\Models\User $user */
+        $user = $request->user();
+        $validated = $request->validated();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        if (!empty($validated['password'])) {
+            $validated['password'] = bcrypt($validated['password']);
+        } else {
+            unset($validated['password']);
         }
 
-        $request->user()->save();
+        $validated['avatar_image'] = $this->avatarService->handle(
+            $request->file('avatar_image'),
+            $user->avatar_image,
+            $request->boolean('remove_avatar')
+        );
+
+        $user->fill($validated);
+
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+        }
+
+        $user->save();
 
         return to_route('profile.edit');
     }

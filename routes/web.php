@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\ManagerController;
+use App\Http\Controllers\Admin\ReceptionistController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
@@ -10,15 +12,24 @@ Route::inertia('/', 'Welcome', [
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'Dashboard/index')->name('dashboard');
 
+    Route::prefix('dashboard')->group(function () {
+        Route::middleware('role:admin')->group(function () {
+            Route::resource('managers', ManagerController::class)
+                ->only(['index', 'store', 'update', 'destroy', 'show']);
+        });
 
-    Route::inertia('dashboard/manage-managers', 'Dashboard/ManageManagers/index')->name('dashboard.manage-managers');
+        Route::middleware('role:admin|manager')->group(function () {
+            Route::resource('receptionists', ReceptionistController::class)
+                ->only(['index', 'store', 'update', 'destroy', 'show']);
+            Route::patch('receptionists/{receptionist}/ban', [ReceptionistController::class, 'ban'])
+                ->name('receptionists.ban');
+            Route::patch('receptionists/{receptionist}/unban', [ReceptionistController::class, 'unban'])
+                ->name('receptionists.unban');
+        });
+    });
 
-
-    Route::inertia('dashboard/manage-receptionists', 'Dashboard/ManageReceptionists/index')->name('dashboard.manage-receptionists');
-
-
-    Route::inertia('dashboard/manage-clients', 'Dashboard/ManageClients/index')->name('dashboard.manage-clients');
-
+    Route::inertia('dashboard/manage-clients', 'Dashboard/ManageClients/index')
+        ->name('dashboard.manage-clients');
 });
 
 require __DIR__.'/settings.php';
