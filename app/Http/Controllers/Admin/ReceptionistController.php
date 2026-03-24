@@ -50,7 +50,7 @@ class ReceptionistController extends Controller
                 'avatar_image' => $r->avatar_image,
                 'created_at' => $r->created_at,
                 'created_by_name' => $r->creator?->name,
-                'banned_at' => $r->isBanned() ? now()->toDateTimeString() : null,
+                'banned_at' => $r->isBanned() ? \Carbon\Carbon::parse($r->banned_at)->toDateTimeString() : null,
             ]);
 
         return Inertia::render('Dashboard/Receptionists/index', [
@@ -83,7 +83,7 @@ class ReceptionistController extends Controller
                     'id' => $receptionist->creator->id,
                     'name' => $receptionist->creator->name,
                 ] : null,
-                'banned_at' => $receptionist->isBanned() ? $receptionist->banned_at->toDateTimeString() : null,
+                'banned_at' => $receptionist->isBanned() ? \Carbon\Carbon::parse($receptionist->banned_at)->toDateTimeString() : null,
             ]
         ]);
     }

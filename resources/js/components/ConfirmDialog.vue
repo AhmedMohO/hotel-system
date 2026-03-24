@@ -12,14 +12,14 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
 import {
     Tooltip,
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { Button } from '@/components/ui/button';
-import { Spinner } from '@/components/ui/spinner';
 
 const props = defineProps<{
     url: string;
@@ -64,30 +64,32 @@ async function confirm() {
 
 <template>
     <AlertDialog v-model:open="open">
-        <AlertDialogTrigger as-child>
-            <slot name="trigger">
-                <template v-if="triggerIcon && triggerTooltip">
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger as-child>
+        <slot name="trigger">
+            <template v-if="triggerIcon && triggerTooltip">
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger as-child>
+                            <AlertDialogTrigger as-child>
                                 <Button :variant="triggerVariant ?? 'ghost'" size="icon" class="h-8 w-8">
                                     <component :is="triggerIcon" class="h-4 w-4" />
                                 </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>{{ triggerTooltip }}</p>
-                            </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
-                </template>
-                <template v-else>
+                            </AlertDialogTrigger>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>{{ triggerTooltip }}</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+            </template>
+            <template v-else>
+                <AlertDialogTrigger as-child>
                     <Button :variant="triggerVariant ?? 'destructive'" size="sm">
                         {{ triggerLabel ?? 'Delete' }}
                     </Button>
-                </template>
-            </slot>
-        </AlertDialogTrigger>
-        <AlertDialogContent>
+                </AlertDialogTrigger>
+            </template>
+        </slot>
+        <AlertDialogContent @interact-outside="open = false" @escape-key-down="open = false">
             <AlertDialogHeader>
                 <AlertDialogTitle>{{
                     title ?? 'Are you absolutely sure?'

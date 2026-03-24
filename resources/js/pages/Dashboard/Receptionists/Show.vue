@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link, usePage } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 import {
     ArrowLeft,
     ShieldAlert,
@@ -7,7 +7,6 @@ import {
     Fingerprint,
     Calendar,
 } from 'lucide-vue-next';
-import { computed } from 'vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -36,8 +35,8 @@ defineProps<{
     };
 }>();
 
-const page = usePage<{ auth: { user: { roles: string[] } } }>();
-const isAdmin = computed(() => page.props.auth.user?.roles?.includes('admin'));
+// const page = usePage<{ auth: { user: { roles: string[] } } }>();
+// const isAdmin = computed(() => page.props.auth.user?.roles?.includes('admin'));
 </script>
 
 <template>

@@ -1,16 +1,15 @@
 <script setup lang="ts">
-import { useForm, usePage, router } from '@inertiajs/vue3';
+import { useForm, usePage } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
+import { Eye, Pencil, Trash2, ShieldAlert, ShieldCheck } from 'lucide-vue-next';
 import { ref, h } from 'vue';
+import ActionIcon from '@/components/ActionIcon.vue';
 import AvatarUpload from '@/components/AvatarUpload.vue';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import DataTable from '@/components/DataTable.vue';
-import UserAvatar from '@/components/UserAvatar.vue';
-import ActionIcon from '@/components/ActionIcon.vue';
 import InputError from '@/components/InputError.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Eye, Pencil, Trash2, ShieldAlert, ShieldCheck } from 'lucide-vue-next';
 import {
     Dialog,
     DialogContent,
@@ -19,6 +18,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import UserAvatar from '@/components/UserAvatar.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import * as Receptionists from '@/routes/receptionists';
 
