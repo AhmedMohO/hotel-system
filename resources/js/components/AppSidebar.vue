@@ -21,10 +21,10 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { dashboard } from '@/routes';
 import * as Managers from '@/routes/managers';
 import * as Receptionists from '@/routes/receptionists';
 import type { NavItem } from '@/types';
-import { dashboard } from '@/routes';
 
 const page = usePage<{ auth: { user: { roles: string[] } } }>();
 const roles = computed(() => page.props.auth.user?.roles ?? []);

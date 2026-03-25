@@ -49,7 +49,7 @@ const props = defineProps<{
 
 const sorting = ref<SortingState>([]);
 const globalFilter = ref(
-    props.filters?.['filter[name]'] ?? props.filters?.search ?? '',
+    props.filters?.filter?.name ?? props.filters?.search ?? '',
 );
 const perPage = ref(props.data.per_page.toString());
 
@@ -106,8 +106,16 @@ function navigateTo(extra: Record<string, any> = {}) {
 function onSearch() {
     clearTimeout(searchTimer);
     searchTimer = setTimeout(() => {
+        const filterState = { ...(props.filters?.filter || {}) };
+        
+        if (globalFilter.value) {
+            filterState.name = globalFilter.value;
+        } else {
+            delete filterState.name;
+        }
+
         navigateTo({
-            'filter[name]': globalFilter.value || undefined,
+            filter: Object.keys(filterState).length > 0 ? filterState : undefined,
             page: 1,
         });
     }, 400);
