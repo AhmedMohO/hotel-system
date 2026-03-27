@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             ManagerSeeder::class,
             ReceptionistSeeder::class,
             RoomSeeder::class,
+            TestDataSeeder::class,
         ]);
     }
 }
