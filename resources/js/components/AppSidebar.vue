@@ -6,6 +6,8 @@ import {
     UserCog,
     UserRound,
     ShieldCheck,
+    Building2,
+    BedDouble,
 } from 'lucide-vue-next';
 import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
@@ -24,6 +26,8 @@ import {
 import { dashboard } from '@/routes';
 import * as Managers from '@/routes/managers';
 import * as Receptionists from '@/routes/receptionists';
+import * as Floors from '@/routes/floors';
+import * as Rooms from '@/routes/rooms';
 import type { NavItem } from '@/types';
 
 const page = usePage<{ auth: { user: { roles: string[] } } }>();
@@ -49,6 +53,18 @@ const mainNavItems = computed<NavItem[]>(() => {
             title: 'Manage Receptionists',
             href: Receptionists.index.url(),
             icon: UserCog,
+        });
+
+        items.push({
+            title: 'Manage Floors',
+            href: Floors.index.url(),
+            icon: Building2,
+        });
+
+        items.push({
+            title: 'Manage Rooms',
+            href: Rooms.index.url(),
+            icon: BedDouble,
         });
     }
 
