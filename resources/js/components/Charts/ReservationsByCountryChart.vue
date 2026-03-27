@@ -112,7 +112,7 @@ watch(
                 <div v-for="item in legendItems" :key="item.name" class="flex items-center justify-between gap-3 px-2">
                     <div class="flex items-center gap-2 min-w-0 flex-shrink">
                         <span class="h-2.5 w-2.5 rounded-sm flex-shrink-0" :style="{ backgroundColor: item.color }"></span>
-                        <span class="text-gray-300 truncate">{{ item.name }}</span>
+                        <span class="text-primary-300 truncate">{{ item.name }}</span>
                     </div>
                     <span class="font-semibold text-gray-100 flex-shrink-0">{{ item.value }}</span>
                 </div>

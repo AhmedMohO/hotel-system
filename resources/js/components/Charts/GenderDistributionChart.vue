@@ -136,7 +136,7 @@ watch(() => currentYear.value, loadData);
             <div class="h-72 min-h-[200px] min-w-[200px] w-full">
                 <Pie :data="chartData" :options="chartOptions" class="h-full w-full" />
             </div>
-            <div class="grid grid-cols-2 gap-2 text-xs text-gray-300">
+            <div class="grid grid-cols-2 gap-2 text-xs text-primary-300">
                 <div v-for="item in legendItems" :key="item.label" class="flex items-center gap-2">
                     <span class="h-2.5 w-2.5 rounded-sm" :style="{ backgroundColor: item.color }"></span>
                     <span>{{ item.label }}</span>
