@@ -47,7 +47,7 @@ function submit() {
     <AppLayout
         :breadcrumbs="[{ title: 'My Profile', href: '/dashboard/profile' }]"
     >
-        <div class="mx-auto max-w-xl space-y-6 p-6">
+        <div class="mx-auto w-full space-y-6 p-6">
             <h1 class="text-2xl font-semibold">Edit Profile</h1>
 
             <form

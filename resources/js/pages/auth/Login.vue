@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import AuthLayout from '@/layouts/auth/AuthSplitLayout.vue';
-import { register } from '@/routes';
+// import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
 
@@ -97,7 +97,7 @@ defineProps<{
                     Log in
                 </Button>
             </div>
-
+            <!--
             <div
                 class="text-center text-sm text-muted-foreground"
                 v-if="canRegister"
@@ -109,7 +109,7 @@ defineProps<{
                     class="underline decoration-muted-foreground/30 underline-offset-4 hover:decoration-current"
                     >Sign up</TextLink
                 >
-            </div>
+            </div> -->
         </Form>
     </AuthLayout>
 </template>

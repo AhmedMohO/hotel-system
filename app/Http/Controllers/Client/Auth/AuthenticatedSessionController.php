@@ -46,7 +46,7 @@ class AuthenticatedSessionController extends Controller
         $client->update(['last_login_at' => now()]);
         $request->session()->regenerate();
 
-        return redirect()->intended(route('client.dashboard'));
+        return redirect()->route('client.dashboard');
     }
 
     public function destroy(Request $request)

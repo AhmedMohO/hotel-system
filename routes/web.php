@@ -40,12 +40,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 
         // Floors & Rooms — Dev 2
-Route::middleware(['auth', 'role:admin|manager'])->group(function () {
-    Route::resource('floors', \App\Http\Controllers\Dashboard\FloorController::class)
-        ->except(['show']);
-    Route::resource('rooms', \App\Http\Controllers\Dashboard\RoomController::class)
-        ->except(['show']);
-});
+        Route::middleware(['auth', 'role:admin|manager'])->group(function () {
+            Route::resource('floors', \App\Http\Controllers\Dashboard\FloorController::class)
+                ->except(['show']);
+            Route::resource('rooms', \App\Http\Controllers\Dashboard\RoomController::class)
+                ->except(['show']);
+        });
     });
 
     Route::inertia('dashboard/manage-clients', 'Dashboard/ManageClients/index')
@@ -53,7 +53,7 @@ Route::middleware(['auth', 'role:admin|manager'])->group(function () {
 
     Route::middleware('role:manager|admin')->get('dashboard/clients/export', [ClientsController::class, 'export'])
         ->name('dashboard.clients.export');
-
+});
 
 Route::prefix('client')
     ->name('client.')
@@ -113,6 +113,7 @@ Route::prefix('client')
     });
 
 
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('role:admin|manager')->prefix('dashboard/api')->group(function () {
         Route::get('statistics', [DashboardController::class, 'statistics'])
             ->name('dashboard.api.statistics');
@@ -126,6 +127,5 @@ Route::prefix('client')
             ->name('dashboard.api.top-reservation-clients');
     });
 });
-
 
 require __DIR__.'/settings.php';

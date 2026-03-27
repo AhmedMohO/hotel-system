@@ -31,6 +31,7 @@ interface Receptionist {
     created_at: string;
     created_by_name: string | null;
     banned_at: string | null;
+    can_manage: boolean;
 }
 
 defineProps<{
@@ -162,48 +163,50 @@ const columns: ColumnDef<Receptionist, any>[] = [
                     variant: 'ghost',
                     href: Receptionists.show.url(r.id),
                 }),
-                h(ActionIcon, {
-                    icon: Pencil,
-                    tooltip: 'Edit',
-                    variant: 'ghost',
-                    onClick: () => openEdit(r),
-                }),
-                r.banned_at
-                    ? h(ConfirmDialog, {
-                          url: Receptionists.unban.url(r.id),
-                          method: 'patch',
-                          title: 'Unban Receptionist?',
-                          description: `Allow ${r.name} to log in again?`,
-                          triggerLabel: 'Unban',
-                          triggerIcon: ShieldCheck,
-                          triggerTooltip: 'Unban',
-                          triggerVariant: 'ghost',
-                          confirmLabel: 'Unban',
-                      })
-                    : h(ConfirmDialog, {
-                          url: Receptionists.ban.url(r.id),
-                          method: 'patch',
-                          title: 'Ban Receptionist?',
-                          description: `Prevent ${r.name} from logging in?`,
-                          triggerLabel: 'Ban',
-                          triggerIcon: ShieldAlert,
-                          triggerTooltip: 'Ban',
-                          triggerVariant: 'ghost',
-                          confirmLabel: 'Ban',
-                          confirmVariant: 'destructive',
-                      }),
-                h(ConfirmDialog, {
-                    url: Receptionists.destroy.url(r.id),
-                    method: 'delete',
-                    title: 'Delete Receptionist?',
-                    description: `Delete ${r.name}? Their account will be soft-deleted.`,
-                    triggerLabel: 'Delete',
-                    triggerIcon: Trash2,
-                    triggerTooltip: 'Delete',
-                    triggerVariant: 'ghost',
-                    confirmLabel: 'Delete',
-                    confirmVariant: 'destructive',
-                }),
+                ...(r.can_manage ? [
+                    h(ActionIcon, {
+                        icon: Pencil,
+                        tooltip: 'Edit',
+                        variant: 'ghost',
+                        onClick: () => openEdit(r),
+                    }),
+                    r.banned_at
+                        ? h(ConfirmDialog, {
+                              url: Receptionists.unban.url(r.id),
+                              method: 'patch',
+                              title: 'Unban Receptionist?',
+                              description: `Allow ${r.name} to log in again?`,
+                              triggerLabel: 'Unban',
+                              triggerIcon: ShieldCheck,
+                              triggerTooltip: 'Unban',
+                              triggerVariant: 'ghost',
+                              confirmLabel: 'Unban',
+                          })
+                        : h(ConfirmDialog, {
+                              url: Receptionists.ban.url(r.id),
+                              method: 'patch',
+                              title: 'Ban Receptionist?',
+                              description: `Prevent ${r.name} from logging in?`,
+                              triggerLabel: 'Ban',
+                              triggerIcon: ShieldAlert,
+                              triggerTooltip: 'Ban',
+                              triggerVariant: 'ghost',
+                              confirmLabel: 'Ban',
+                              confirmVariant: 'destructive',
+                          }),
+                    h(ConfirmDialog, {
+                        url: Receptionists.destroy.url(r.id),
+                        method: 'delete',
+                        title: 'Delete Receptionist?',
+                        description: `Delete ${r.name}? Their account will be soft-deleted.`,
+                        triggerLabel: 'Delete',
+                        triggerIcon: Trash2,
+                        triggerTooltip: 'Delete',
+                        triggerVariant: 'ghost',
+                        confirmLabel: 'Delete',
+                        confirmVariant: 'destructive',
+                    }),
+                ] : []),
             ]);
         },
     },

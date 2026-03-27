@@ -88,14 +88,17 @@ defineProps<{
                     <InputError :message="errors.mobile" />
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="grid gap-2">
+                <div class="flex gap-4">
+                    <div class="grid w-full gap-2">
                         <Label>Country</Label>
                         <Select name="country" required>
-                            <SelectTrigger tabindex="4">
-                                <SelectValue placeholder="Select country" />
+                            <SelectTrigger class="w-full" tabindex="4">
+                                <SelectValue
+                                    class=""
+                                    placeholder="Select country"
+                                />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent class="w-[200px]!">
                                 <SelectItem
                                     v-for="country in countries"
                                     :key="country.name"
@@ -111,10 +114,10 @@ defineProps<{
                         <InputError :message="errors.country" />
                     </div>
 
-                    <div class="grid gap-2">
+                    <div class="grid w-full gap-2">
                         <Label>Gender</Label>
                         <Select name="gender" required>
-                            <SelectTrigger tabindex="5">
+                            <SelectTrigger class="w-full" tabindex="5">
                                 <SelectValue placeholder="Select gender" />
                             </SelectTrigger>
                             <SelectContent>

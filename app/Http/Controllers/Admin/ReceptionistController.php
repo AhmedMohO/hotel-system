@@ -34,10 +34,6 @@ class ReceptionistController extends Controller
                 AllowedFilter::partial('email'),
             );
 
-        // Managers only see their own receptionists; Admins see all
-        if ($authUser->hasRole('manager')) {
-            $query->where('created_by', $authUser->id);
-        }
 
         $receptionists = $query
             ->paginate($request->filled('per_page') ? $request->per_page : 10)
@@ -51,6 +47,8 @@ class ReceptionistController extends Controller
                 'created_at' => $r->created_at,
                 'created_by_name' => $r->creator?->name,
                 'banned_at' => $r->isBanned() ? \Carbon\Carbon::parse($r->banned_at)->toDateTimeString() : null,
+                // true for admins always; true for managers only if they created this receptionist
+                'can_manage' => $authUser->hasRole('admin') || $r->created_by === $authUser->id,
             ]);
 
         return Inertia::render('Dashboard/Receptionists/index', [
@@ -61,14 +59,6 @@ class ReceptionistController extends Controller
 
     public function show(Request $request, User $receptionist)
     {
-        /** @var User $authUser */
-        $authUser = $request->user();
-
-        // Managers can only view their own receptionists
-        if ($authUser->hasRole('manager') && $receptionist->created_by !== $authUser->id) {
-            abort(403, 'Unauthorized action.');
-        }
-
         $receptionist->load('creator:id,name');
 
         return Inertia::render('Dashboard/Receptionists/Show', [
@@ -106,6 +96,8 @@ class ReceptionistController extends Controller
 
     public function update(UpdateReceptionistRequest $request, User $receptionist)
     {
+        $this->authorizeManagerAction($request, $receptionist);
+
         $validated = $request->validated();
 
         if (!empty($validated['password'])) {
@@ -125,8 +117,10 @@ class ReceptionistController extends Controller
         return redirect()->route('receptionists.index')->with('success', 'Receptionist updated successfully.');
     }
 
-    public function destroy(User $receptionist)
+    public function destroy(Request $request, User $receptionist)
     {
+        $this->authorizeManagerAction($request, $receptionist);
+
         if ($receptionist->canBeHardDeleted()) {
             $receptionist->forceDelete();
             $message = 'Receptionist permanently deleted because they had no linked records.';
@@ -138,17 +132,30 @@ class ReceptionistController extends Controller
         return redirect()->back()->with('success', $message);
     }
 
-    public function ban(User $receptionist)
+    public function ban(Request $request, User $receptionist)
     {
+        $this->authorizeManagerAction($request, $receptionist);
         $receptionist->ban();
 
         return redirect()->back()->with('success', 'Receptionist banned.');
     }
 
-    public function unban(User $receptionist)
+    public function unban(Request $request, User $receptionist)
     {
+        $this->authorizeManagerAction($request, $receptionist);
         $receptionist->unban();
 
         return redirect()->back()->with('success', 'Receptionist unbanned.');
+    }
+
+    /** Abort 403 if the authenticated manager did not create this receptionist. */
+    private function authorizeManagerAction(Request $request, User $receptionist): void
+    {
+        /** @var User $authUser */
+        $authUser = $request->user();
+
+        if ($authUser->hasRole('manager') && $receptionist->created_by !== $authUser->id) {
+            abort(403, 'You can only manage receptionists you created.');
+        }
     }
 }
