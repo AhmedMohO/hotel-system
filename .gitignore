@@ -26,3 +26,7 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+/info
+
+package-lock.json
+composer.lock

@@ -42,6 +42,7 @@
         "@vueuse/core": "^12.8.2",
         "axios": "^1.13.6",
         "chart.js": "^4.5.1",
+        "chartjs-plugin-datalabels": "^2.2.0",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "dnd-kit-vue": "^0.0.2",

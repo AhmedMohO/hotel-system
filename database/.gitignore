@@ -1,1 +1,3 @@
 *.sqlite*
+/seeders/TestDataSeeder.php
+/seeders/RoomSeeder.php

@@ -21,7 +21,7 @@ class UpdateReceptionistRequest extends FormRequest
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $receptionistId],
             'password' => ['nullable', 'string', 'min:6'],
             'national_id' => ['required', 'string', 'unique:users,national_id,' . $receptionistId],
-            'avatar_image' => ['nullable', 'image', 'mimes:jpg,jpeg', 'max:2048'],
+            'avatar_image' => \App\Services\AvatarService::rules(),
         ];
     }
 }

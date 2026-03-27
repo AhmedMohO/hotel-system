@@ -7,6 +7,7 @@ const props = defineProps<{
     currentAvatar?: string | null;
     error?: string;
     removed?: boolean;
+    name?: string;
 }>();
 
 const emit = defineEmits<{
@@ -99,14 +100,15 @@ function removeAvatar() {
         <input
             ref="inputRef"
             type="file"
-            accept=".jpg,.jpeg,.png,.webp"
+            :name="name"
+            accept=".jpg,.jpeg"
             class="hidden"
             @change="onFileChange"
         />
         <div class="text-center">
             <p v-if="error" class="text-xs text-destructive">{{ error }}</p>
             <p v-else class="text-xs text-muted-foreground">
-                JPG/PNG/WEBP · Max 2MB
+                JPG/JPEG · Max 2MB
             </p>
         </div>
     </div>

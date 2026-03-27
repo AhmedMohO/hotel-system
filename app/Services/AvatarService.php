@@ -9,6 +9,19 @@ class AvatarService
 {
     public const DEFAULT_AVATAR = 'avatars/default.jpg';
 
+    /**
+     * Get the standardized validation rules for an avatar image.
+     */
+    public static function rules(bool $required = false): array
+    {
+        return [
+            $required ? 'required' : 'nullable',
+            'image',
+            'mimes:jpg,jpeg',
+            'max:2048',
+        ];
+    }
+
     public function handle(UploadedFile $file = null, ?string $currentAvatar = null, bool $remove = false): ?string
     {
         if ($remove || $file) {

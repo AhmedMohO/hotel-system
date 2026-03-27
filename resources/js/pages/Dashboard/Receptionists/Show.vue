@@ -8,7 +8,7 @@ import {
     Calendar,
 } from 'lucide-vue-next';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+
 import {
     Card,
     CardContent,
@@ -62,7 +62,10 @@ defineProps<{
                         class="mb-4 -ml-3 text-base font-semibold text-muted-foreground hover:text-foreground"
                         as-child
                     >
-                        <Link :href="Receptionists.index.url()">
+                        <Link
+                            class="flex items-center"
+                            :href="Receptionists.index.url()"
+                        >
                             <ArrowLeft class="mr-2 h-5 w-5" />
                             Back to Receptionists
                         </Link>
@@ -95,7 +98,7 @@ defineProps<{
             </div>
 
             <!-- Main Content -->
-            <div class="grid grid-cols-1 gap-10 lg:grid-cols-4">
+            <div class="grid grid-cols-1 gap-4 lg:grid-cols-4">
                 <!-- Left Column: Profile Card -->
                 <div class="lg:col-span-1">
                     <Card class="rounded-xl border-border bg-card shadow-none">
@@ -104,7 +107,7 @@ defineProps<{
                         >
                             <UserAvatar
                                 :user="receptionist"
-                                class="mb-6 h-40 w-40 border-2 border-border shadow-none"
+                                class="mb-6 h-40 w-40 shadow-none"
                                 :class="{
                                     'opacity-75 grayscale':
                                         receptionist.banned_at,
@@ -187,7 +190,9 @@ defineProps<{
                         </div>
                     </Card>
 
-                    <Card class="rounded-xl border-border bg-card shadow-none">
+                    <Card
+                        class="rounded-xl border-border bg-card p-0 shadow-none"
+                    >
                         <CardHeader
                             class="border-b border-border bg-muted/30 px-8 py-6"
                         >
@@ -249,27 +254,17 @@ defineProps<{
                                             class="text-muted-foreground"
                                             >System Admin</span
                                         >
-                                        <template v-else>
-                                            <Button
-                                                variant="link"
-                                                class="h-auto p-0 text-xl font-bold text-primary hover:text-primary/80"
-                                                as-child
-                                            >
-                                                <Link
-                                                    :href="
-                                                        Managers.show.url(
-                                                            receptionist
-                                                                .created_by.id,
-                                                        )
-                                                    "
-                                                >
-                                                    {{
-                                                        receptionist.created_by
-                                                            .name
-                                                    }}
-                                                </Link>
-                                            </Button>
-                                        </template>
+                                        <Link
+                                            v-else
+                                            :href="
+                                                Managers.show.url(
+                                                    receptionist.created_by.id,
+                                                )
+                                            "
+                                            class="text-xl font-bold text-primary hover:text-primary/80 hover:underline"
+                                        >
+                                            {{ receptionist.created_by.name }}
+                                        </Link>
                                     </dd>
                                 </div>
                                 <div>

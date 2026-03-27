@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 
 use Spatie\Permission\Traits\HasRoles;
@@ -21,7 +22,7 @@ use Cog\Laravel\Ban\Traits\Bannable;
 class User extends Authenticatable implements BannableContract
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, TwoFactorAuthenticatable, HasRoles, SoftDeletes, Bannable;
+    use HasApiTokens, HasFactory, Notifiable, TwoFactorAuthenticatable, HasRoles, SoftDeletes, Bannable;
 
     /**
      * Get the attributes that should be cast.
