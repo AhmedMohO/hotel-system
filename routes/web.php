@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\ManagerController;
+use App\Http\Controllers\Admin\ClientsController;
 use App\Http\Controllers\Admin\ReceptionistController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
@@ -31,6 +32,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::inertia('dashboard/manage-clients', 'Dashboard/ManageClients/index')
         ->name('dashboard.manage-clients');
+
+    Route::middleware('role:manager|admin')->get('dashboard/clients/export', [ClientsController::class, 'export'])
+        ->name('dashboard.clients.export');
 
     Route::middleware('role:admin|manager')->prefix('dashboard/api')->group(function () {
         Route::get('statistics', [DashboardController::class, 'statistics'])
