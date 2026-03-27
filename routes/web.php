@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\Admin\ManagerController;
+use App\Http\Controllers\Admin\ClientsController;
 use App\Http\Controllers\Admin\ReceptionistController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
@@ -30,6 +32,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::inertia('dashboard/manage-clients', 'Dashboard/ManageClients/index')
         ->name('dashboard.manage-clients');
+
+    Route::middleware('role:manager|admin')->get('dashboard/clients/export', [ClientsController::class, 'export'])
+        ->name('dashboard.clients.export');
+
+    Route::middleware('role:admin|manager')->prefix('dashboard/api')->group(function () {
+        Route::get('statistics', [DashboardController::class, 'statistics'])
+            ->name('dashboard.api.statistics');
+        Route::get('gender-distribution', [DashboardController::class, 'genderDistribution'])
+            ->name('dashboard.api.gender-distribution');
+        Route::get('reservations-revenue-monthly', [DashboardController::class, 'reservationsRevenueMonthly'])
+            ->name('dashboard.api.reservations-revenue-monthly');
+        Route::get('reservations-by-country', [DashboardController::class, 'reservationsByCountry'])
+            ->name('dashboard.api.reservations-by-country');
+        Route::get('top-reservation-clients', [DashboardController::class, 'topReservationClients'])
+            ->name('dashboard.api.top-reservation-clients');
+    });
 });
 
 require __DIR__.'/settings.php';
