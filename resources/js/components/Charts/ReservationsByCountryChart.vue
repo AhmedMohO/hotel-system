@@ -99,10 +99,10 @@ watch(
             </Select>
         </div>
         <div v-if="loading" class="flex items-center justify-center h-64">
-            <span class="text-gray-500 text-sm">Loading...</span>
+            <span class="text-primary-500 text-sm">Loading...</span>
         </div>
         <div v-else-if="!hasData" class="flex items-center justify-center h-64">
-            <span class="text-gray-500 text-sm">No data available</span>
+            <span class="text-primary-500 text-sm">No data available</span>
         </div>
         <div v-else class="space-y-4">
             <div class="h-72 min-h-[200px] min-w-[200px] w-full">
@@ -114,7 +114,7 @@ watch(
                         <span class="h-2.5 w-2.5 rounded-sm flex-shrink-0" :style="{ backgroundColor: item.color }"></span>
                         <span class="text-primary-300 truncate">{{ item.name }}</span>
                     </div>
-                    <span class="font-semibold text-gray-100 flex-shrink-0">{{ item.value }}</span>
+                    <span class="font-semibold text-primary-100 flex-shrink-0">{{ item.value }}</span>
                 </div>
             </div>
         </div>

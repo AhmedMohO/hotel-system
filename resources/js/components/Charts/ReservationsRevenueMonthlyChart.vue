@@ -96,7 +96,7 @@ watch(
             </Select>
         </div>
         <div v-if="loading" class="flex items-center justify-center h-64">
-            <span class="text-gray-500 text-sm">Loading...</span>
+            <span class="text-primary-500 text-sm">Loading...</span>
         </div>
         <div v-else class="h-[420px] w-full">
             <Line :data="chartData" :options="chartOptions" class="h-full w-full" />

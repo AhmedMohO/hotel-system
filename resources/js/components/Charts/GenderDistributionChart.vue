@@ -127,10 +127,10 @@ watch(() => currentYear.value, loadData);
             </Select>
         </div>
         <div v-if="loading" class="flex items-center justify-center h-64">
-            <span class="text-gray-500 text-sm">Loading...</span>
+            <span class="text-primary-500 text-sm">Loading...</span>
         </div>
         <div v-else-if="!hasData" class="flex items-center justify-center h-64">
-            <span class="text-gray-500 text-sm">No data available</span>
+            <span class="text-primary-500 text-sm">No data available</span>
         </div>
         <div v-else class="space-y-4">
             <div class="h-72 min-h-[200px] min-w-[200px] w-full">
