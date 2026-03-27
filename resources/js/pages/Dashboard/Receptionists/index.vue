@@ -42,6 +42,7 @@ defineProps<{
         total: number;
         from: number;
         to: number;
+        links: { url: string | null; label: string; active: boolean }[];
     };
     filters: Record<string, any>;
 }>();
@@ -154,7 +155,7 @@ const columns: ColumnDef<Receptionist, any>[] = [
         cell: ({ row }) => {
             const r = row.original;
 
-            return h('div', { class: 'flex flex-wrap gap-2' }, [
+            return h('div', { class: 'flex gap-2' }, [
                 h(ActionIcon, {
                     icon: Eye,
                     tooltip: 'View',

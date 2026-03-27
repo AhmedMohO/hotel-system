@@ -18,7 +18,7 @@ class ProfileUpdateRequest extends FormRequest
     public function rules(): array
     {
         return array_merge($this->profileRules($this->user()->id), [
-            'avatar_image' => ['nullable', 'image', 'mimes:jpg,jpeg', 'max:2048'],
+            'avatar_image' => \App\Services\AvatarService::rules(),
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
         ]);
     }

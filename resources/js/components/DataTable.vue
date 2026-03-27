@@ -11,7 +11,7 @@ import {
     ChevronsLeft,
     ChevronsRight,
 } from 'lucide-vue-next';
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -38,6 +38,7 @@ interface PaginatedData<T> {
     total: number;
     from: number;
     to: number;
+    links: { url: string | null; label: string; active: boolean }[];
 }
 
 const props = defineProps<{
@@ -107,7 +108,7 @@ function onSearch() {
     clearTimeout(searchTimer);
     searchTimer = setTimeout(() => {
         const filterState = { ...(props.filters?.filter || {}) };
-        
+
         if (globalFilter.value) {
             filterState.name = globalFilter.value;
         } else {
@@ -115,7 +116,8 @@ function onSearch() {
         }
 
         navigateTo({
-            filter: Object.keys(filterState).length > 0 ? filterState : undefined,
+            filter:
+                Object.keys(filterState).length > 0 ? filterState : undefined,
             page: 1,
         });
     }, 400);
@@ -132,38 +134,6 @@ function onPerPageChange(val: any) {
 
     navigateTo({ per_page: val, page: 1 });
 }
-
-// Compute pagination button numbers to show
-const pageNumbers = computed(() => {
-    const current = props.data.current_page;
-    const last = props.data.last_page;
-    const delta = 2;
-    const range = [];
-
-    for (
-        let i = Math.max(2, current - delta);
-        i <= Math.min(last - 1, current + delta);
-        i++
-    ) {
-        range.push(i);
-    }
-
-    if (current - delta > 2) {
-        range.unshift('...');
-    }
-
-    if (current + delta < last - 1) {
-        range.push('...');
-    }
-
-    range.unshift(1);
-
-    if (last !== 1) {
-        range.push(last);
-    }
-
-    return range;
-});
 </script>
 
 <template>
@@ -289,19 +259,22 @@ const pageNumbers = computed(() => {
                 </Button>
 
                 <!-- Numbered Buttons -->
-                <template v-for="(page, idx) in pageNumbers" :key="idx">
+                <template
+                    v-for="(link, idx) in data.links.slice(1, -1)"
+                    :key="idx"
+                >
                     <Button
-                        v-if="page !== '...'"
+                        v-if="link.label !== '...'"
                         variant="outline"
                         class="h-8 w-8 p-0"
                         :class="
-                            page === data.current_page
-                                ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                            link.active
+                                ? 'bg-secondary! text-white hover:bg-secondary/90!'
                                 : ''
                         "
-                        @click="goToPage(page as number)"
+                        @click="goToPage(Number(link.label))"
                     >
-                        {{ page }}
+                        {{ link.label }}
                     </Button>
                     <span v-else class="px-2">...</span>
                 </template>

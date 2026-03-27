@@ -39,6 +39,7 @@ defineProps<{
         total: number;
         from: number;
         to: number;
+        links: { url: string | null; label: string; active: boolean }[];
     };
     filters: Record<string, any>;
 }>();

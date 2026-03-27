@@ -21,7 +21,7 @@ class UpdateManagerRequest extends FormRequest
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $managerId],
             'password' => ['nullable', 'string', 'min:6'],
             'national_id' => ['required', 'string', 'unique:users,national_id,' . $managerId],
-            'avatar_image' => ['nullable', 'image', 'mimes:jpg,jpeg', 'max:2048'],
+            'avatar_image' => \App\Services\AvatarService::rules(),
         ];
     }
 }

@@ -39,8 +39,10 @@ class ManagerController extends Controller
         ]);
     }
 
-    public function show(User $manager)
+    public function show(int $manager)
     {
+        $manager = User::withTrashed()->findOrFail($manager);
+
         return Inertia::render('Dashboard/Managers/Show', [
             'manager' => [
                 'id' => $manager->id,
@@ -49,6 +51,7 @@ class ManagerController extends Controller
                 'national_id' => $manager->national_id,
                 'avatar_image' => $manager->avatar_image,
                 'created_at' => $manager->created_at->toDateTimeString(),
+                'deleted_at' => $manager->deleted_at?->toDateTimeString(),
             ]
         ]);
     }

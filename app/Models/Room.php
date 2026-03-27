@@ -2,12 +2,18 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Room extends Model
 {
-    public function floor(): BelongsTo
+    use HasFactory;
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class);
+    }
+
+    public function floor()
     {
         return $this->belongsTo(Floor::class);
     }

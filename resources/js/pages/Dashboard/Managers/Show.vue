@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import { ArrowLeft, Calendar, Mail, Fingerprint } from 'lucide-vue-next';
+import { ArrowLeft, Calendar, Mail, Fingerprint, Trash2 } from 'lucide-vue-next';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -22,6 +23,7 @@ defineProps<{
         national_id: string;
         avatar_image: string | null;
         created_at: string;
+        deleted_at: string | null;
     };
 }>();
 </script>
@@ -40,7 +42,7 @@ defineProps<{
         >
             <!-- Header -->
             <div
-                class="mb-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+                class="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"
             >
                 <div>
                     <Button
@@ -63,10 +65,19 @@ defineProps<{
                         Detailed information and account status.
                     </p>
                 </div>
+
+                <Badge
+                    v-if="manager.deleted_at"
+                    variant="destructive"
+                    class="self-start rounded-none px-4 py-1 text-base font-bold tracking-widest uppercase shadow-none sm:self-auto"
+                >
+                    <Trash2 class="mr-2 h-4 w-4" />
+                    Deleted Account
+                </Badge>
             </div>
 
             <!-- Main Content -->
-            <div class="grid grid-cols-1 gap-10 lg:grid-cols-4">
+            <div class="grid grid-cols-1 gap-4 lg:grid-cols-4">
                 <!-- Left Column: Profile Card -->
                 <div class="lg:col-span-1">
                     <Card class="rounded-xl border-border bg-card shadow-none">
@@ -75,7 +86,10 @@ defineProps<{
                         >
                             <UserAvatar
                                 :user="manager"
-                                class="mb-6 h-40 w-40 border-2 border-border shadow-none"
+                                class="mb-6 h-40 w-40 shadow-none"
+                                :class="{
+                                    'opacity-75 grayscale': manager.deleted_at,
+                                }"
                             />
 
                             <h2 class="text-2xl font-bold text-foreground">
@@ -130,7 +144,9 @@ defineProps<{
 
                 <!-- Right Column: Details -->
                 <div class="space-y-10 lg:col-span-3">
-                    <Card class="rounded-xl border-border bg-card shadow-none">
+                    <Card
+                        class="rounded-xl border-border bg-card p-0 shadow-none"
+                    >
                         <CardHeader
                             class="border-b border-border bg-muted/30 px-8 py-6"
                         >

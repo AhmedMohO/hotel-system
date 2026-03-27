@@ -16,6 +16,11 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
+        $middleware->redirectUsersTo(function (\Illuminate\Http\Request $request) {
+            return \Illuminate\Support\Facades\Auth::guard('client')->check()
+                ? route('client.dashboard')
+                : route('dashboard');
+        });
 
         $middleware->web(append: [
             HandleAppearance::class,
