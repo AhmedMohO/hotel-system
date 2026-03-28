@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
+import { Toaster } from 'vue-sonner';
 import AppLogo from '@/components/AppLogo.vue';
 import PlaceholderPattern from '@/components/PlaceholderPattern.vue';
 import ThemeSwitcher from '@/components/ThemeSwitcher.vue';
+import { useAppearance } from '@/composables/useAppearance';
 import { home } from '@/routes';
+
+const { appearance } = useAppearance();
 
 defineProps<{
     title?: string;
@@ -13,7 +17,7 @@ defineProps<{
 
 <template>
     <div
-        class="relative grid h-dvh flex-col items-center justify-center px-8 sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0"
+        class="relative grid min-h-dvh flex-col items-center justify-center px-8 sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0"
     >
         <div class="absolute top-4 right-4 z-50 lg:top-8 lg:right-8">
             <ThemeSwitcher />
@@ -71,5 +75,6 @@ defineProps<{
                 </blockquote>
             </div>
         </div>
+        <Toaster :theme="appearance" rich-colors close-button position="top-center" />
     </div>
 </template>

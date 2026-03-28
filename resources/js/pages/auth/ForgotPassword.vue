@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
+import { toast } from 'vue-sonner';
 import InputError from '@/components/InputError.vue';
 import TextLink from '@/components/TextLink.vue';
 import { Button } from '@/components/ui/button';
@@ -30,7 +31,12 @@ defineProps<{
         </div>
 
         <div class="space-y-6">
-            <Form v-bind="email.form()" v-slot="{ errors, processing }">
+            <Form
+                v-bind="email.form()"
+                @success="toast.success('Password reset link sent!')"
+                @error="toast.error('Failed to send reset link. Please check your email address.')"
+                v-slot="{ errors, processing }"
+            >
                 <div class="grid gap-2">
                     <Label for="email">Email address</Label>
                     <Input

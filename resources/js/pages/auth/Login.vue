@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
+import { toast } from 'vue-sonner';
 import InputError from '@/components/InputError.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
 import TextLink from '@/components/TextLink.vue';
@@ -37,6 +38,8 @@ defineProps<{
         <Form
             v-bind="store.form()"
             :reset-on-success="['password']"
+            @success="toast.success('Successfully logged in!')"
+            @error="toast.error('Login failed. Please check your credentials.')"
             v-slot="{ errors, processing }"
             class="flex flex-col gap-6"
         >

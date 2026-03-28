@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
+import { toast } from 'vue-sonner';
 import AvatarUpload from '@/components/AvatarUpload.vue';
 import InputError from '@/components/InputError.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
@@ -20,7 +21,7 @@ import { login } from '@/routes/client';
 import { store } from '@/routes/client/register';
 
 defineProps<{
-    countries?: { name: string; iso2: string; emoji: string }[];
+    countries?: { name: string; iso2: string }[];
 }>();
 </script>
 
@@ -34,6 +35,8 @@ defineProps<{
         <Form
             v-bind="store.form()"
             :reset-on-success="['password', 'password_confirmation']"
+            @success="toast.success('Account created successfully!')"
+            @error="toast.error('Registration failed. Please check your inputs.')"
             v-slot="{ errors, processing }"
             class="flex flex-col gap-6"
         >
@@ -104,9 +107,7 @@ defineProps<{
                                     :key="country.name"
                                     :value="country.name"
                                 >
-                                    <span class="mr-2">{{
-                                        country.emoji
-                                    }}</span>
+                                    <span class="mr-2">{{ country.iso2 }}</span>
                                     {{ country.name }}
                                 </SelectItem>
                             </SelectContent>

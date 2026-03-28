@@ -19,7 +19,6 @@ class RegisteredClientController extends Controller
                 ->map(fn ($name, $iso2) => [
                     'name' => $name,
                     'iso2' => $iso2,
-                    'emoji' => implode('', array_map(fn($c) => mb_chr(mb_ord($c) + 127397), str_split(strtoupper($iso2)))),
                 ])->values()
         );
 

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
 import { ref } from 'vue';
+import { toast } from 'vue-sonner';
 import InputError from '@/components/InputError.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
 import { Button } from '@/components/ui/button';
@@ -29,6 +30,8 @@ const inputEmail = ref(props.email);
             v-bind="update.form()"
             :transform="(data) => ({ ...data, token, email })"
             :reset-on-success="['password', 'password_confirmation']"
+            @success="toast.success('Password reset successfully!')"
+            @error="toast.error('Failed to reset password. Please check your inputs.')"
             v-slot="{ errors, processing }"
         >
             <div class="grid gap-6">

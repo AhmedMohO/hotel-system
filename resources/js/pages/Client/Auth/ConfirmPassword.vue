@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
+import { toast } from 'vue-sonner';
 import InputError from '@/components/InputError.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
 import { Button } from '@/components/ui/button';
@@ -19,6 +20,8 @@ import { store } from '@/routes/client/password/confirm';
         <Form
             v-bind="store.form()"
             reset-on-success
+            @success="toast.success('Password confirmed!')"
+            @error="toast.error('Incorrect password. Please try again.')"
             v-slot="{ errors, processing }"
         >
             <div class="grid gap-6">

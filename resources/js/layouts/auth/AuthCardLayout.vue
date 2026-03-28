@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
+import { Toaster } from 'vue-sonner';
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
 import ThemeSwitcher from '@/components/ThemeSwitcher.vue';
 import {
@@ -9,7 +10,10 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import { useAppearance } from '@/composables/useAppearance';
 import { home } from '@/routes';
+
+const { appearance } = useAppearance();
 
 defineProps<{
     title?: string;
@@ -46,5 +50,6 @@ defineProps<{
                 </Card>
             </div>
         </div>
+        <Toaster :theme="appearance" rich-colors close-button position="top-center" />
     </div>
 </template>
