@@ -21,7 +21,7 @@ import { login } from '@/routes/client';
 import { store } from '@/routes/client/register';
 
 defineProps<{
-    countries?: { name: string; iso2: string }[];
+    countries?: { name: string }[];
 }>();
 </script>
 
@@ -36,7 +36,9 @@ defineProps<{
             v-bind="store.form()"
             :reset-on-success="['password', 'password_confirmation']"
             @success="toast.success('Account created successfully!')"
-            @error="toast.error('Registration failed. Please check your inputs.')"
+            @error="
+                toast.error('Registration failed. Please check your inputs.')
+            "
             v-slot="{ errors, processing }"
             class="flex flex-col gap-6"
         >
@@ -101,13 +103,12 @@ defineProps<{
                                     placeholder="Select country"
                                 />
                             </SelectTrigger>
-                            <SelectContent class="w-[200px]!">
+                            <SelectContent class="max-w-[220px]!">
                                 <SelectItem
                                     v-for="country in countries"
                                     :key="country.name"
                                     :value="country.name"
                                 >
-                                    <span class="mr-2">{{ country.iso2 }}</span>
                                     {{ country.name }}
                                 </SelectItem>
                             </SelectContent>

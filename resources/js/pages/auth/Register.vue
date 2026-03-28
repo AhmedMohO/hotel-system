@@ -24,7 +24,9 @@ import { store } from '@/routes/register';
             v-bind="store.form()"
             :reset-on-success="['password', 'password_confirmation']"
             @success="toast.success('Account created successfully!')"
-            @error="toast.error('Registration failed. Please check your inputs.')"
+            @error="
+                toast.error('Registration failed. Please check your inputs.')
+            "
             v-slot="{ errors, processing }"
             class="flex flex-col gap-6"
         >

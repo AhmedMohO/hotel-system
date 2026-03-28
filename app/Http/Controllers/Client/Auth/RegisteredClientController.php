@@ -16,10 +16,9 @@ class RegisteredClientController extends Controller
             'countries',
             3600,
             fn () => collect((new \Monarobase\CountryList\CountryList)->getList('en'))
-                ->map(fn ($name, $iso2) => [
+                ->map(fn ($name) => [
                     'name' => $name,
-                    'iso2' => $iso2,
-                ])->values()
+                ])->values()->toArray()
         );
 
         return Inertia::render('Client/Auth/Register', [
