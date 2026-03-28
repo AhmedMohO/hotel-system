@@ -19,30 +19,33 @@ const stats = ref<Stats>({
     totalRooms: 0,
 });
 
+const loading = ref(true);
+
 const totalRevenue = computed(() => Number(stats.value.totalRevenue ?? 0) / 100);
 
-const formatRevenue = (val: number) => {
-    if (val >= 1_000_000) {
-        return `${(val / 1_000_000).toFixed(1)}M`;
-    }
+const compactRevenueFormatter = new Intl.NumberFormat('en-US', {
+    notation: 'compact',
+    maximumFractionDigits: 1,
+});
 
-    if (val >= 1_000) {
-        return `${(val / 1_000).toFixed(1)}K`;
-    }
-
-    return val.toLocaleString('en-US', { maximumFractionDigits: 2 });
-};
+const formatRevenue = (val: number) => compactRevenueFormatter.format(val);
 
 const fullRevenueLabel = computed(() => `$${totalRevenue.value.toLocaleString('en-US', { maximumFractionDigits: 2 })}`);
 
-onMounted(async () => {
+const loadStatistics = async () => {
+    loading.value = true;
+
     try {
         const response = await axios.get('/dashboard/api/statistics');
         stats.value = response.data;
     } catch (error) {
         console.error('Error loading statistics:', error);
+    } finally {
+        loading.value = false;
     }
-});
+};
+
+onMounted(loadStatistics);
 </script>
 
 <template>
@@ -59,7 +62,8 @@ onMounted(async () => {
                 <DollarSign class="h-4 w-4 text-muted-foreground" />
                 <span>Total Revenue</span>
             </div>
-            <span :title="fullRevenueLabel" class="mt-2 block min-w-0 truncate text-3xl font-bold tabular-nums">${{ formatRevenue(totalRevenue) }}</span>
+            <span v-if="loading" class="mt-2 block text-3xl font-bold tabular-nums text-muted-foreground">...</span>
+            <span v-else :title="fullRevenueLabel" class="mt-2 block min-w-0 truncate text-3xl font-bold tabular-nums">${{ formatRevenue(totalRevenue) }}</span>
         </div>
 
         <!-- Active Clients -->

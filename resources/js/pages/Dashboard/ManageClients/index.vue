@@ -2,6 +2,7 @@
 import { usePage } from '@inertiajs/vue3';
 import { Head } from '@inertiajs/vue3';
 import { computed } from 'vue';
+import { toast } from 'vue-sonner';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { BreadcrumbItem } from '@/types';
@@ -19,6 +20,22 @@ const canExportClients = computed(() => {
 
     return roles.includes('manager') || roles.includes('admin');
 });
+
+const handleExportClick = () => {
+    toast.promise(
+        new Promise((resolve) => {
+            setTimeout(() => {
+                window.location.href = '/dashboard/clients/export';
+                resolve(null);
+            }, 500);
+        }),
+        {
+            loading: 'Preparing your export...',
+            success: 'Export started! Your file will download shortly.',
+            error: 'Failed to export clients.',
+        },
+    );
+};
 </script>
 
 <template>
@@ -32,8 +49,8 @@ const canExportClients = computed(() => {
                     <p class="mt-2 text-sm text-primary-700 dark:text-primary-300">List of all clients.</p>
                 </div>
 
-                <Button v-if="canExportClients" as-child>
-                    <a href="/dashboard/clients/export">Export to Excel</a>
+                <Button v-if="canExportClients" @click="handleExportClick">
+                    Export to Excel
                 </Button>
             </div>
         </div>
