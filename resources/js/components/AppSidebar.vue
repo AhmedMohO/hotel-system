@@ -8,6 +8,7 @@ import {
     ShieldCheck,
     Building2,
     BedDouble,
+    ClipboardList,
 } from 'lucide-vue-next';
 import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
@@ -24,9 +25,9 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import * as Floors from '@/routes/floors';
 import * as Managers from '@/routes/managers';
 import * as Receptionists from '@/routes/receptionists';
-import * as Floors from '@/routes/floors';
 import * as Rooms from '@/routes/rooms';
 import type { NavItem } from '@/types';
 
@@ -34,6 +35,7 @@ const page = usePage<{ auth: { user: { roles: string[] } } }>();
 const roles = computed(() => page.props.auth.user?.roles ?? []);
 const isAdmin = computed(() => roles.value.includes('admin'));
 const isManager = computed(() => roles.value.includes('manager'));
+const isReceptionist = computed(() => roles.value.includes('receptionist'));
 
 const mainNavItems = computed<NavItem[]>(() => {
     const items: NavItem[] = [
@@ -65,6 +67,14 @@ const mainNavItems = computed<NavItem[]>(() => {
             title: 'Manage Rooms',
             href: Rooms.index.url(),
             icon: BedDouble,
+        });
+    }
+
+    if (isReceptionist.value) {
+        items.push({
+            title: 'Clients Reservations',
+            href: '/dashboard/clients-reservations',
+            icon: ClipboardList,
         });
     }
 
