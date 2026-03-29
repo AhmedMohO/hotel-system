@@ -49,14 +49,38 @@ const emit = defineEmits<{
 const open = ref(false);
 const processing = ref(false);
 
+// async function confirm() {
+//     processing.value = true;
+//     router.visit(props.url, {
+//         method: props.method ?? 'delete',
+//         preserveState: false,
+//         onSuccess: () => {
+//             const message = props.successMessage ?? `${props.title?.replace('?', '') ?? 'Action'} completed successfully!`;
+//             toast.success(message);
+//             emit('success');
+//             open.value = false;
+//         },
+//         onError: () => {
+//             toast.error('Action failed. Please try again.');
+//         },
+//         onFinish: () => {
+//             processing.value = false;
+//         },
+//     });
+// }
+
 async function confirm() {
     processing.value = true;
     router.visit(props.url, {
         method: props.method ?? 'delete',
         preserveState: false,
-        onSuccess: () => {
-            const message = props.successMessage ?? `${props.title?.replace('?', '') ?? 'Action'} completed successfully!`;
-            toast.success(message);
+        onSuccess: (page) => {
+            const flash = (page.props as any).flash;
+            if (flash?.error) {
+                toast.error(flash.error);
+            } else {
+                toast.success(flash?.success ?? `${props.title?.replace('?', '') ?? 'Action'} completed successfully!`);
+            }
             emit('success');
             open.value = false;
         },

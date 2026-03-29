@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import InputError from '@/components/InputError.vue';
 import * as Rooms from '@/routes/rooms';
+import { toast } from 'vue-sonner';
 
 const props = defineProps<{ room: any; floors: any[] }>();
 
@@ -16,8 +17,18 @@ const form = useForm({
     price:    props.room.price_dollars,
 });
 
+// function submit() {
+//     form.put(Rooms.update.url(props.room.id));
+// }
+
 function submit() {
-    form.put(Rooms.update.url(props.room.id));
+    form.put(Rooms.update.url(props.room.id), {
+        onSuccess: () => {
+            toast.success('Room updated successfully!');
+            // router.visit(Rooms.index.url());
+        },
+        onError: () => toast.error('Please fix the errors below.'),
+    });
 }
 </script>
 

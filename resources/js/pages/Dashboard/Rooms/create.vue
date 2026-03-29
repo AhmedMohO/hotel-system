@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import InputError from '@/components/InputError.vue';
 import * as Rooms from '@/routes/rooms';
+import { toast } from 'vue-sonner';
 
 const props = defineProps<{ floors: any[] }>();
 
@@ -16,8 +17,20 @@ const form = useForm({
     price:    '',
 });
 
+
+
+// function submit() {
+//     form.post(Rooms.store.url());
+// }
+
 function submit() {
-    form.post(Rooms.store.url());
+    form.post(Rooms.store.url(), {
+        onSuccess: () => {
+            toast.success('Room created successfully!');
+            // router.visit(Rooms.index.url());
+        },
+        onError: () => toast.error('Please fix the errors below.'),
+    });
 }
 </script>
 

@@ -7,6 +7,7 @@ import { Pencil, Trash2 } from 'lucide-vue-next';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Button } from '@/components/ui/button';
 import * as Rooms from '@/routes/rooms';
+
 import { h } from 'vue';
 
 defineProps<{
@@ -14,9 +15,13 @@ defineProps<{
     filters: Record<string, any>;
 }>();
 
+
+
+
+
 const page = usePage();
 const isAdmin = (page.props.auth.user as any).roles?.includes('admin');
-const flash = (page.props as any).flash;
+// const flash = (page.props as any).flash;
 
 const columns = [
     { accessorKey: 'number',        header: 'Room Number', enableSorting: true },
@@ -43,6 +48,8 @@ const columns = [
                 triggerIcon: Trash2,
                 triggerTooltip: 'Delete',
                 triggerVariant: 'ghost',
+                triggerClass:
+                    'text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-950/60 dark:hover:text-red-300',
                 confirmLabel: 'Delete',
                 confirmVariant: 'destructive',
             }),
@@ -55,7 +62,7 @@ const columns = [
     <AppLayout :breadcrumbs="[{ title: 'Rooms', href: Rooms.index.url() }]">
         <div class="space-y-6 p-6">
 
-            <div v-if="flash?.error"
+            <!-- <div v-if="flash?.error"
                  class="rounded-md border border-destructive bg-destructive/10 px-4 py-3 text-sm text-destructive">
                 {{ flash.error }}
             </div>
@@ -63,14 +70,14 @@ const columns = [
             <div v-if="flash?.success"
                  class="rounded-md border border-green-500 bg-green-500/10 px-4 py-3 text-sm text-green-600">
                 {{ flash.success }}
-            </div>
+            </div> -->
 
             <div class="flex items-center justify-between">
                 <h1 class="text-2xl font-semibold">Manage Rooms</h1>
                <Button variant="default" @click="router.visit(Rooms.create.url())">+ Add Room</Button>
             </div>
 
-            <DataTable :data="rooms" :columns="columns" :filters="filters" />
+            <DataTable :data="rooms" :columns="columns" search-placeholder="Search rooms..." />
         </div>
     </AppLayout>
 </template>

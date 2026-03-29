@@ -12,27 +12,54 @@ use Inertia\Inertia;
 
 class RoomController extends Controller
 {
+    // public function index(Request $request)
+    // {
+    //     $rooms = Room::with(['floor', 'creator'])
+    //         ->when($request->search, fn($q) => $q->where('number', 'like', "%{$request->search}%"))
+    //         ->when($request->sort && $request->direction, fn($q) =>
+    //             $q->orderBy($request->sort, $request->direction))
+    //         ->latest()
+    //         ->paginate(10)
+    //         ->withQueryString();
+
+    //     // Convert price from cents to dollars for display
+    //     $rooms->getCollection()->transform(function ($room) {
+    //         $room->price_dollars = $room->price / 100;
+    //         return $room;
+    //     });
+
+    //     return Inertia::render('Dashboard/Rooms/index', [
+    //         'rooms'   => $rooms,
+    //         'filters' => $request->only(['search', 'sort', 'direction']),
+    //     ]);
+    // }
+
     public function index(Request $request)
-    {
-        $rooms = Room::with(['floor', 'creator'])
-            ->when($request->search, fn($q) => $q->where('number', 'like', "%{$request->search}%"))
-            ->when($request->sort && $request->direction, fn($q) =>
-                $q->orderBy($request->sort, $request->direction))
-            ->latest()
-            ->paginate(10)
-            ->withQueryString();
+{
+    $rooms = Room::with(['floor', 'creator'])
+        ->when($request->input('filter.name'), fn($q, $search) =>
+            $q->where('number', 'like', "%{$search}%")
+              ->orWhereHas('floor', fn($q) => $q->where('name', 'like', "%{$search}%"))
+        )
+        ->when($request->sort, function($q) use ($request) {
+            $sort = $request->sort;
+            $dir = str_starts_with($sort, '-') ? 'desc' : 'asc';
+            $col = ltrim($sort, '-');
+            $q->orderBy($col, $dir);
+        }, fn($q) => $q->latest())
+        ->paginate($request->input('per_page', 10))
+        ->withQueryString();
 
-        // Convert price from cents to dollars for display
-        $rooms->getCollection()->transform(function ($room) {
-            $room->price_dollars = $room->price / 100;
-            return $room;
-        });
+    $rooms->getCollection()->transform(function ($room) {
+        $room->price_dollars = $room->price / 100;
+        return $room;
+    });
 
-        return Inertia::render('Dashboard/Rooms/index', [
-            'rooms'   => $rooms,
-            'filters' => $request->only(['search', 'sort', 'direction']),
-        ]);
-    }
+    return Inertia::render('Dashboard/Rooms/index', [
+        'rooms'   => $rooms,
+        'filters' => $request->only(['filter', 'sort', 'per_page']),
+    ]);
+}
 
     public function create()
     {

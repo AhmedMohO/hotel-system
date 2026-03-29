@@ -11,25 +11,46 @@ use Inertia\Inertia;
 
 class FloorController extends Controller
 {
+    // public function index(Request $request)
+    // {
+    //     $user = $request->user();
+
+    //     $floorsQuery = Floor::with('creator')
+    //         ->when($request->search, fn($q) => $q->where('name', 'like', "%{$request->search}%")
+    //             ->orWhere('number', 'like', "%{$request->search}%"))
+    //         ->when($request->sort && $request->direction, fn($q) =>
+    //             $q->orderBy($request->sort, $request->direction))
+    //         ->latest();
+
+    //     $floors = $floorsQuery->paginate(10)->withQueryString();
+
+    //     return Inertia::render('Dashboard/Floors/index', [
+    //         'floors'  => $floors,
+    //         'filters' => $request->only(['search', 'sort', 'direction']),
+    //     ]);
+    // }
+
     public function index(Request $request)
-    {
-        $user = $request->user();
+{
+    $floors = Floor::with('creator')
+        ->when($request->input('filter.name'), fn($q, $search) =>
+            $q->where('name', 'like', "%{$search}%")
+              ->orWhere('number', 'like', "%{$search}%")
+        )
+        ->when($request->sort, function($q) use ($request) {
+            $sort = $request->sort;
+            $dir = str_starts_with($sort, '-') ? 'desc' : 'asc';
+            $col = ltrim($sort, '-');
+            $q->orderBy($col, $dir);
+        }, fn($q) => $q->latest())
+        ->paginate($request->input('per_page', 10))
+        ->withQueryString();
 
-        $floorsQuery = Floor::with('creator')
-            ->when($request->search, fn($q) => $q->where('name', 'like', "%{$request->search}%")
-                ->orWhere('number', 'like', "%{$request->search}%"))
-            ->when($request->sort && $request->direction, fn($q) =>
-                $q->orderBy($request->sort, $request->direction))
-            ->latest();
-
-        $floors = $floorsQuery->paginate(10)->withQueryString();
-
-        return Inertia::render('Dashboard/Floors/index', [
-            'floors'  => $floors,
-            'filters' => $request->only(['search', 'sort', 'direction']),
-        ]);
-    }
-
+    return Inertia::render('Dashboard/Floors/index', [
+        'floors'  => $floors,
+        'filters' => $request->only(['filter', 'sort', 'per_page']),
+    ]);
+}
     public function create()
     {
         return Inertia::render('Dashboard/Floors/create');

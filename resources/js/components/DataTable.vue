@@ -46,6 +46,7 @@ const props = defineProps<{
     columns: ColumnDef<any, any>[];
     filters?: Record<string, any>;
     routeParams?: Record<string, any>;
+    searchPlaceholder?: string;
 }>();
 
 const sorting = ref<SortingState>([]);
@@ -141,7 +142,7 @@ function onPerPageChange(val: any) {
         <!-- Search -->
         <Input
             v-model="globalFilter"
-            placeholder="Search..."
+            :placeholder="searchPlaceholder ?? 'Search...'"
             class="max-w-xs"
             @input="onSearch"
         />

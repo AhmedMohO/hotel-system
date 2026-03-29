@@ -6,13 +6,25 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import InputError from '@/components/InputError.vue';
 import * as Floors from '@/routes/floors';
+import { toast } from 'vue-sonner';
 
 const props = defineProps<{ floor: any }>();
 
 const form = useForm({ name: props.floor.name });
 
+// function submit() {
+//     form.put(Floors.update.url(props.floor.id));
+// }
+
+
 function submit() {
-    form.put(Floors.update.url(props.floor.id));
+    form.put(Floors.update.url(props.floor.id), {
+        onSuccess: () => {
+            toast.success('Floor updated successfully!');
+            // router.visit(Floors.index.url());
+        },
+        onError: () => toast.error('Please fix the errors below.'),
+    });
 }
 </script>
 

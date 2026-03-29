@@ -6,11 +6,22 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import InputError from '@/components/InputError.vue';
 import * as Floors from '@/routes/floors';
+import { toast } from 'vue-sonner';
 
 const form = useForm({ name: '' });
 
+// function submit() {
+//     form.post(Floors.store.url());
+// }
+
 function submit() {
-    form.post(Floors.store.url());
+    form.post(Floors.store.url(), {
+        onSuccess: () => {
+            toast.success('Floor created successfully!');
+            // router.visit(Floors.index.url());
+        },
+        onError: () => toast.error('Please fix the errors below.'),
+    });
 }
 </script>
 
