@@ -1,5 +1,122 @@
+<script setup lang="ts">
+import { Link, router, usePage, Head } from '@inertiajs/vue3';
+import { computed, ref } from 'vue';
+import { toast } from 'vue-sonner';
+import AppLayout from '@/layouts/app/AppSidebarLayout.vue';
+import type { BreadcrumbItem } from '@/types';
+
+type Client = {
+    id: number;
+    name: string;
+    email: string;
+    avatar_image: string | null;
+    created_at: string;
+    approved_at: string | null;
+};
+
+type PaginationLink = { label: string; url: string | null; active: boolean };
+
+type Pagination = {
+    data: Client[];
+    from: number;
+    to: number;
+    total: number;
+    last_page: number;
+    links: PaginationLink[];
+};
+
+type SharedProps = {
+    auth: { user: { roles: string[] } };
+    flash: { success: string | null; error: string | null };
+};
+
+const breadcrumbs: BreadcrumbItem[] = [
+    { title: 'Dashboard', href: '/dashboard' },
+    { title: 'Manage Clients', href: '/dashboard/manage-clients' },
+];
+
+// ── Props ─────────────────────────────────────────────────────────────────────
+const { clients } = defineProps<{ clients: Pagination }>();
+
+// ── Auth ──────────────────────────────────────────────────────────────────────
+const page = usePage<SharedProps>();
+const flash = computed(
+    () => page.props.flash ?? { success: null, error: null },
+);
+const roles = computed(() => page.props.auth?.user?.roles ?? []);
+const isAdminOrManager = computed(
+    () => roles.value.includes('admin') || roles.value.includes('manager'),
+);
+
+// ── Export ───────────────────────────────────────────────────────────────────
+function exportExcel() {
+    toast.promise(
+        new Promise((resolve) => {
+            setTimeout(() => {
+                window.location.href = '/dashboard/clients/export/excel';
+                resolve(null);
+            }, 500);
+        }),
+        {
+            loading: 'Preparing your export...',
+            success: 'Export started! Your file will download shortly.',
+            error: 'Failed to export clients.',
+        },
+    );
+}
+
+function approve(client: Client) {
+    router.post(
+        `/dashboard/clients/${client.id}/approve`,
+        {},
+        {
+            preserveScroll: true,
+        },
+    );
+}
+
+function unapprove(client: Client) {
+    router.patch(
+        `/dashboard/clients/${client.id}/unapprove`,
+        {},
+        {
+            preserveScroll: true,
+        },
+    );
+}
+
+// ── Delete ────────────────────────────────────────────────────────────────────
+const deleteTarget = ref<{ id: number; name: string } | null>(null);
+
+function confirmDelete(client: { id: number; name: string }) {
+    deleteTarget.value = client;
+}
+
+function doDelete() {
+    if (!deleteTarget.value?.id) {
+        return;
+    }
+
+    router.delete(`/dashboard/clients/${deleteTarget.value.id}`, {
+        preserveScroll: true,
+        onSuccess: () => {
+            deleteTarget.value = null;
+        },
+    });
+}
+
+function formatDate(dateStr: string) {
+    return new Date(dateStr).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+    });
+}
+</script>
+
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
+        <Head title="Manage Clients" />
         <div class="min-h-screen bg-slate-50">
             <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
                 <div
@@ -410,105 +527,3 @@
         </div>
     </AppLayout>
 </template>
-<script setup lang="ts">
-import { Link, router, usePage } from '@inertiajs/vue3';
-import { computed, ref } from 'vue';
-import AppLayout from '@/layouts/app/AppSidebarLayout.vue';
-import type { BreadcrumbItem } from '@/types';
-
-type Client = {
-    id: number;
-    name: string;
-    email: string;
-    avatar_image: string | null;
-    created_at: string;
-    approved_at: string | null;
-};
-
-type PaginationLink = { label: string; url: string | null; active: boolean };
-
-type Pagination = {
-    data: Client[];
-    from: number;
-    to: number;
-    total: number;
-    last_page: number;
-    links: PaginationLink[];
-};
-
-type SharedProps = {
-    auth: { user: { roles: string[] } };
-    flash: { success: string | null; error: string | null };
-};
-
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Dashboard', href: '/dashboard' },
-    { title: 'Manage Clients', href: '/dashboard/clients' },
-];
-
-// ── Props ─────────────────────────────────────────────────────────────────────
-const { clients } = defineProps<{ clients: Pagination }>();
-
-// ── Auth ──────────────────────────────────────────────────────────────────────
-const page = usePage<SharedProps>();
-const flash = computed(
-    () => page.props.flash ?? { success: null, error: null },
-);
-const roles = computed(() => page.props.auth?.user?.roles ?? []);
-const isAdminOrManager = computed(
-    () => roles.value.includes('admin') || roles.value.includes('manager'),
-);
-
-// ── Export ───────────────────────────────────────────────────────────────────
-function exportExcel() {
-    window.location.href = '/dashboard/clients/export/excel';
-}
-
-function approve(client: Client) {
-    router.post(
-        `/dashboard/clients/${client.id}/approve`,
-        {},
-        {
-            preserveScroll: true,
-        },
-    );
-}
-
-function unapprove(client: Client) {
-    router.patch(
-        `/dashboard/clients/${client.id}/unapprove`,
-        {},
-        {
-            preserveScroll: true,
-        },
-    );
-}
-
-// ── Delete ────────────────────────────────────────────────────────────────────
-const deleteTarget = ref<{ id: number; name: string } | null>(null);
-
-function confirmDelete(client: { id: number; name: string }) {
-    deleteTarget.value = client;
-}
-
-function doDelete() {
-    if (!deleteTarget.value?.id) {
-        return;
-    }
-
-    router.delete(`/dashboard/clients/${deleteTarget.value.id}`, {
-        preserveScroll: true,
-        onSuccess: () => {
-            deleteTarget.value = null;
-        },
-    });
-}
-
-function formatDate(dateStr: string) {
-    return new Date(dateStr).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-    });
-}
-</script>

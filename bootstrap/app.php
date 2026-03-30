@@ -15,17 +15,26 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
         $middleware->redirectUsersTo(function (\Illuminate\Http\Request $request) {
             return \Illuminate\Support\Facades\Auth::guard('client')->check()
                 ? route('client.dashboard')
                 : route('dashboard');
         });
 
+        $middleware->redirectGuestsTo(function (\Illuminate\Http\Request $request) {
+            if ($request->is('client') || $request->is('client/*')) {
+                return route('client.login');
+            }
+            return route('login');
+        });
+
+        $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
+
         $middleware->web(append: [
             HandleAppearance::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
+            \App\Http\Middleware\EnsureUserIsNotBanned::class,
         ]);
 
         // Register Spatie Laravel Permission middleware aliases

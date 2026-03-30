@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Notifications\ClientResetPasswordNotification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -90,5 +91,16 @@ class Client extends Authenticatable
         return $this->avatar_image
             ? asset('storage/'.$this->avatar_image)
             : asset('images/default-avatar.png');
+    }
+
+    /**
+     * Send the password reset notification.
+     *
+     * @param  string  $token
+     * @return void
+     */
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new ClientResetPasswordNotification($token));
     }
 }

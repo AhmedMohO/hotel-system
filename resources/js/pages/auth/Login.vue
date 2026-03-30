@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
+import { toast } from 'vue-sonner';
 import InputError from '@/components/InputError.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
 import TextLink from '@/components/TextLink.vue';
@@ -9,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import AuthLayout from '@/layouts/auth/AuthSplitLayout.vue';
-import { register } from '@/routes';
+// import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
 
@@ -37,6 +38,8 @@ defineProps<{
         <Form
             v-bind="store.form()"
             :reset-on-success="['password']"
+            @success="toast.success('Successfully logged in!')"
+            @error="toast.error('Login failed. Please check your credentials.')"
             v-slot="{ errors, processing }"
             class="flex flex-col gap-6"
         >
@@ -97,7 +100,7 @@ defineProps<{
                     Log in
                 </Button>
             </div>
-
+            <!--
             <div
                 class="text-center text-sm text-muted-foreground"
                 v-if="canRegister"
@@ -109,7 +112,7 @@ defineProps<{
                     class="underline decoration-muted-foreground/30 underline-offset-4 hover:decoration-current"
                     >Sign up</TextLink
                 >
-            </div>
+            </div> -->
         </Form>
     </AuthLayout>
 </template>

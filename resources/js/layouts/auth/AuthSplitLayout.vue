@@ -1,9 +1,14 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
+import { Toaster } from 'vue-sonner';
 import AppLogo from '@/components/AppLogo.vue';
+import AppLogoIcon from '@/components/AppLogoIcon.vue';
 import PlaceholderPattern from '@/components/PlaceholderPattern.vue';
 import ThemeSwitcher from '@/components/ThemeSwitcher.vue';
+import { useAppearance } from '@/composables/useAppearance';
 import { home } from '@/routes';
+
+const { appearance } = useAppearance();
 
 defineProps<{
     title?: string;
@@ -13,16 +18,29 @@ defineProps<{
 
 <template>
     <div
-        class="relative grid h-dvh flex-col items-center justify-center px-8 sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0"
+        class="relative grid min-h-dvh flex-col items-center justify-center px-8 sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0"
     >
         <div class="absolute top-4 right-4 z-50 lg:top-8 lg:right-8">
             <ThemeSwitcher />
         </div>
         <div class="lg:p-8">
             <div
-                class="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]"
+                class="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[450px]"
             >
                 <div class="flex flex-col space-y-2 text-center">
+                    <Link
+                        :href="home()"
+                        class="flex flex-col items-center gap-2 font-medium"
+                    >
+                        <div
+                            class="mb-1 flex h-14 w-14 items-center justify-center"
+                        >
+                            <AppLogoIcon
+                                class="size-14 rounded-lg fill-current text-[var(--foreground)] dark:text-white"
+                            />
+                        </div>
+                        <span class="sr-only">{{ title }}</span>
+                    </Link>
                     <h1
                         class="text-2xl font-semibold tracking-tight"
                         v-if="title"
@@ -72,4 +90,10 @@ defineProps<{
             </div>
         </div>
     </div>
+    <Toaster
+        :theme="appearance"
+        rich-colors
+        close-button
+        position="top-center"
+    />
 </template>

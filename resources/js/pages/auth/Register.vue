@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
+import { toast } from 'vue-sonner';
 import InputError from '@/components/InputError.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
 import TextLink from '@/components/TextLink.vue';
@@ -22,6 +23,10 @@ import { store } from '@/routes/register';
         <Form
             v-bind="store.form()"
             :reset-on-success="['password', 'password_confirmation']"
+            @success="toast.success('Account created successfully!')"
+            @error="
+                toast.error('Registration failed. Please check your inputs.')
+            "
             v-slot="{ errors, processing }"
             class="flex flex-col gap-6"
         >

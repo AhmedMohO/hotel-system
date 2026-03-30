@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
+import { toast } from 'vue-sonner';
 import TextLink from '@/components/TextLink.vue';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
@@ -29,6 +30,8 @@ defineProps<{
 
         <Form
             v-bind="send.form()"
+            @success="toast.success('Verification link sent!')"
+            @error="toast.error('Failed to send verification link. Please try again.')"
             class="flex flex-col gap-6"
             v-slot="{ processing }"
         >

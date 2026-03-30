@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import { ArrowLeft, Calendar, Mail, Fingerprint, Trash2 } from 'lucide-vue-next';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-    CardDescription,
-} from '@/components/ui/card';
+    ArrowLeft,
+    Trash2,
+    Mail,
+    Fingerprint,
+    Calendar,
+    Hash,
+} from 'lucide-vue-next';
+import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import UserAvatar from '@/components/UserAvatar.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
@@ -29,7 +28,7 @@ defineProps<{
 </script>
 
 <template>
-    <Head :title="`Manager: ${manager.name}`" />
+    <Head :title="`${manager.name} — Manager`" />
 
     <AppLayout
         :breadcrumbs="[
@@ -37,212 +36,291 @@ defineProps<{
             { title: manager.name, href: '' },
         ]"
     >
-        <div
-            class="mx-auto min-h-screen max-w-7xl bg-muted/5 px-4 py-10 sm:px-6 lg:px-8"
-        >
-            <!-- Header -->
+        <div class="flex min-h-full flex-col">
+            <!-- Top bar -->
             <div
-                class="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"
+                class="flex shrink-0 items-center justify-between gap-4 border-b px-6 py-3.5"
             >
-                <div>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        class="mb-4 -ml-3 text-base font-semibold text-muted-foreground hover:text-foreground"
-                        as-child
-                    >
-                        <Link :href="Managers.index.url()">
-                            <ArrowLeft class="mr-2 h-5 w-5" />
-                            Back to Managers
-                        </Link>
-                    </Button>
-                    <h1
-                        class="text-4xl font-extrabold tracking-tight text-foreground"
-                    >
-                        Manager Profile
-                    </h1>
-                    <p class="mt-2 text-base font-medium text-muted-foreground">
-                        Detailed information and account status.
-                    </p>
-                </div>
-
-                <Badge
-                    v-if="manager.deleted_at"
-                    variant="destructive"
-                    class="self-start rounded-none px-4 py-1 text-base font-bold tracking-widest uppercase shadow-none sm:self-auto"
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    class="-ml-2 gap-1.5 text-muted-foreground hover:text-foreground"
+                    as-child
                 >
-                    <Trash2 class="mr-2 h-4 w-4" />
-                    Deleted Account
-                </Badge>
+                    <Link :href="Managers.index.url()">
+                        <ArrowLeft class="h-4 w-4" />
+                        Managers
+                    </Link>
+                </Button>
+
+                <span
+                    v-if="manager.deleted_at"
+                    class="inline-flex items-center gap-1.5 rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700 dark:bg-red-950 dark:text-red-400"
+                >
+                    <Trash2 class="h-3.5 w-3.5" />
+                    Deleted
+                </span>
+                <span
+                    v-else
+                    class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400"
+                >
+                    <span class="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                    Active
+                </span>
             </div>
 
-            <!-- Main Content -->
-            <div class="grid grid-cols-1 gap-4 lg:grid-cols-4">
-                <!-- Left Column: Profile Card -->
-                <div class="lg:col-span-1">
-                    <Card class="rounded-xl border-border bg-card shadow-none">
-                        <CardContent
-                            class="flex flex-col items-center p-8 text-center"
-                        >
-                            <UserAvatar
-                                :user="manager"
-                                class="mb-6 h-40 w-40 shadow-none"
-                                :class="{
-                                    'opacity-75 grayscale': manager.deleted_at,
-                                }"
-                            />
-
-                            <h2 class="text-2xl font-bold text-foreground">
-                                {{ manager.name }}
-                            </h2>
-                            <p
-                                class="mt-1 text-base font-semibold text-muted-foreground"
-                            >
-                                Admin Manager
-                            </p>
-
-                            <Separator class="my-8 w-full" />
-
-                            <div class="w-full space-y-5 text-left">
-                                <div
-                                    class="flex items-center text-base font-semibold text-muted-foreground"
-                                >
-                                    <Mail
-                                        class="mr-3 h-5 w-5 text-foreground/70"
-                                    />
-                                    <span class="truncate">{{
-                                        manager.email
-                                    }}</span>
-                                </div>
-                                <div
-                                    class="flex items-center text-base font-semibold text-muted-foreground"
-                                >
-                                    <Fingerprint
-                                        class="mr-3 h-5 w-5 text-foreground/70"
-                                    />
-                                    <span>{{ manager.national_id }}</span>
-                                </div>
-                                <div
-                                    class="flex items-center text-base font-semibold text-muted-foreground"
-                                >
-                                    <Calendar
-                                        class="mr-3 h-5 w-5 text-foreground/70"
-                                    />
-                                    <span
-                                        >Joined
-                                        {{
-                                            new Date(
-                                                manager.created_at,
-                                            ).toLocaleDateString()
-                                        }}</span
-                                    >
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
-
-                <!-- Right Column: Details -->
-                <div class="space-y-10 lg:col-span-3">
-                    <Card
-                        class="rounded-xl border-border bg-card p-0 shadow-none"
+            <!-- Body: sidebar + main -->
+            <div class="flex flex-1 flex-col lg:flex-row">
+                <!-- Sidebar -->
+                <aside
+                    class="w-full shrink-0 border-b lg:w-72 lg:border-r lg:border-b-0 xl:w-80"
+                >
+                    <div
+                        class="flex flex-col items-center gap-4 px-8 py-10 text-center"
                     >
-                        <CardHeader
-                            class="border-b border-border bg-muted/30 px-8 py-6"
+                        <UserAvatar
+                            :user="manager"
+                            class="h-24 w-24 rounded-full ring-4 ring-border"
+                            :class="{
+                                'opacity-60 grayscale': manager.deleted_at,
+                            }"
+                        />
+                        <div>
+                            <h1 class="text-lg leading-tight font-semibold">
+                                {{ manager.name }}
+                            </h1>
+                            <p class="mt-1 text-sm text-muted-foreground">
+                                Manager
+                            </p>
+                        </div>
+                    </div>
+
+                    <Separator />
+
+                    <div class="flex flex-col divide-y">
+                        <div class="flex items-start gap-3 px-6 py-4">
+                            <Mail
+                                class="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground"
+                            />
+                            <div class="min-w-0">
+                                <p
+                                    class="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase"
+                                >
+                                    Email
+                                </p>
+                                <p class="mt-0.5 text-sm font-medium break-all">
+                                    {{ manager.email }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3 px-6 py-4">
+                            <Fingerprint
+                                class="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground"
+                            />
+                            <div>
+                                <p
+                                    class="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase"
+                                >
+                                    National ID
+                                </p>
+                                <p
+                                    class="mt-0.5 font-mono text-sm font-medium tracking-wide"
+                                >
+                                    {{ manager.national_id }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3 px-6 py-4">
+                            <Hash
+                                class="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground"
+                            />
+                            <div>
+                                <p
+                                    class="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase"
+                                >
+                                    System ID
+                                </p>
+                                <p class="mt-0.5 font-mono text-sm font-medium">
+                                    #{{ manager.id }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3 px-6 py-4">
+                            <Calendar
+                                class="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground"
+                            />
+                            <div>
+                                <p
+                                    class="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase"
+                                >
+                                    Joined
+                                </p>
+                                <p class="mt-0.5 text-sm font-medium">
+                                    {{
+                                        new Date(
+                                            manager.created_at,
+                                        ).toLocaleDateString('en-US', {
+                                            dateStyle: 'medium',
+                                        })
+                                    }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Main -->
+                <main class="flex-1 px-6 py-8 lg:px-10">
+                    <!-- Deleted notice -->
+                    <div
+                        v-if="manager.deleted_at"
+                        class="mb-8 flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 px-5 py-4 dark:border-red-900 dark:bg-red-950/40"
+                    >
+                        <Trash2
+                            class="mt-0.5 h-4 w-4 shrink-0 text-red-600 dark:text-red-400"
+                        />
+                        <div>
+                            <p
+                                class="text-sm font-semibold text-red-700 dark:text-red-400"
+                            >
+                                Account deleted
+                            </p>
+                            <p
+                                class="mt-0.5 text-sm text-red-600/80 dark:text-red-500"
+                            >
+                                This account was soft-deleted on
+                                {{
+                                    new Date(manager.deleted_at).toLocaleString(
+                                        'en-US',
+                                        {
+                                            dateStyle: 'long',
+                                            timeStyle: 'short',
+                                        },
+                                    )
+                                }}. The record is retained but the manager can
+                                no longer access the platform.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Account Details -->
+                    <section>
+                        <h2
+                            class="mb-4 text-xs font-semibold tracking-wider text-muted-foreground uppercase"
                         >
-                            <CardTitle
-                                class="text-2xl font-bold text-foreground"
-                                >Personal Information</CardTitle
+                            Account Details
+                        </h2>
+
+                        <div class="overflow-hidden rounded-xl border bg-card">
+                            <div
+                                class="grid grid-cols-1 divide-y sm:grid-cols-2 sm:divide-x sm:divide-y-0"
                             >
-                            <CardDescription
-                                class="mt-2 text-base font-medium text-muted-foreground"
-                            >
-                                Complete details of this manager's platform
-                                identity.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent class="p-8">
-                            <dl
-                                class="grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2"
-                            >
-                                <div>
-                                    <dt
-                                        class="text-sm font-bold tracking-widest text-muted-foreground uppercase"
+                                <div class="px-6 py-5">
+                                    <p
+                                        class="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase"
                                     >
                                         Full Name
-                                    </dt>
-                                    <dd
-                                        class="mt-2 text-xl font-bold text-foreground"
-                                    >
+                                    </p>
+                                    <p class="mt-1.5 text-base font-semibold">
                                         {{ manager.name }}
-                                    </dd>
+                                    </p>
                                 </div>
-                                <div>
-                                    <dt
-                                        class="text-sm font-bold tracking-widest text-muted-foreground uppercase"
+                                <div class="px-6 py-5">
+                                    <p
+                                        class="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase"
                                     >
                                         Email Address
-                                    </dt>
-                                    <dd
-                                        class="mt-2 text-xl font-bold text-foreground"
+                                    </p>
+                                    <p
+                                        class="mt-1.5 text-base font-semibold break-all"
                                     >
                                         {{ manager.email }}
-                                    </dd>
+                                    </p>
                                 </div>
+                            </div>
 
-                                <div class="sm:col-span-2">
-                                    <Separator class="my-2" />
-                                </div>
+                            <Separator />
 
-                                <div>
-                                    <dt
-                                        class="text-sm font-bold tracking-widest text-muted-foreground uppercase"
+                            <div
+                                class="grid grid-cols-1 divide-y sm:grid-cols-2 sm:divide-x sm:divide-y-0"
+                            >
+                                <div class="px-6 py-5">
+                                    <p
+                                        class="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase"
                                     >
                                         National ID
-                                    </dt>
-                                    <dd
-                                        class="mt-2 text-xl font-bold text-foreground"
+                                    </p>
+                                    <p
+                                        class="mt-1.5 font-mono text-base font-semibold tracking-wide"
                                     >
                                         {{ manager.national_id }}
-                                    </dd>
+                                    </p>
                                 </div>
-                                <div>
-                                    <dt
-                                        class="text-sm font-bold tracking-widest text-muted-foreground uppercase"
+                                <div class="px-6 py-5">
+                                    <p
+                                        class="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase"
+                                    >
+                                        System ID
+                                    </p>
+                                    <p
+                                        class="mt-1.5 font-mono text-base font-semibold"
+                                    >
+                                        #{{ manager.id }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <Separator />
+
+                            <div
+                                class="grid grid-cols-1 divide-y sm:grid-cols-2 sm:divide-x sm:divide-y-0"
+                            >
+                                <div class="px-6 py-5">
+                                    <p
+                                        class="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase"
                                     >
                                         Account Created
-                                    </dt>
-                                    <dd
-                                        class="mt-2 text-xl font-bold text-foreground"
-                                    >
+                                    </p>
+                                    <p class="mt-1.5 text-base font-semibold">
                                         {{
                                             new Date(
                                                 manager.created_at,
-                                            ).toLocaleString()
+                                            ).toLocaleString('en-US', {
+                                                dateStyle: 'medium',
+                                                timeStyle: 'short',
+                                            })
                                         }}
-                                    </dd>
+                                    </p>
                                 </div>
-
-                                <div class="sm:col-span-2">
-                                    <Separator class="my-2" />
-                                </div>
-
-                                <div>
-                                    <dt
-                                        class="text-sm font-bold tracking-widest text-muted-foreground uppercase"
+                                <div
+                                    v-if="manager.deleted_at"
+                                    class="px-6 py-5"
+                                >
+                                    <p
+                                        class="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase"
                                     >
-                                        System ID
-                                    </dt>
-                                    <dd
-                                        class="mt-2 text-xl font-bold text-foreground"
+                                        Deleted At
+                                    </p>
+                                    <p
+                                        class="mt-1.5 text-base font-semibold text-red-600 dark:text-red-400"
                                     >
-                                        #{{ manager.id }}
-                                    </dd>
+                                        {{
+                                            new Date(
+                                                manager.deleted_at,
+                                            ).toLocaleString('en-US', {
+                                                dateStyle: 'medium',
+                                                timeStyle: 'short',
+                                            })
+                                        }}
+                                    </p>
                                 </div>
-                            </dl>
-                        </CardContent>
-                    </Card>
-                </div>
+                            </div>
+                        </div>
+                    </section>
+                </main>
             </div>
         </div>
     </AppLayout>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
+import { toast } from 'vue-sonner';
 import AvatarUpload from '@/components/AvatarUpload.vue';
 import DeleteUser from '@/components/DeleteUser.vue';
 import Heading from '@/components/Heading.vue';
@@ -47,9 +48,13 @@ function submitAvatar() {
         .post('/settings/profile', {
             forceFormData: true,
             onSuccess: () => {
+                toast.success('Profile updated successfully!');
                 avatarForm.password = '';
                 avatarForm.password_confirmation = '';
                 avatarForm.avatar_image = null;
+            },
+            onError: () => {
+                toast.error('Failed to update profile. Please check the form fields.');
             },
         });
 }

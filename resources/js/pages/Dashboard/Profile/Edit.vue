@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3';
+import { toast } from 'vue-sonner';
 import AvatarUpload from '@/components/AvatarUpload.vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
@@ -33,10 +34,14 @@ function submit() {
         {
             forceFormData: true,
             onSuccess: () => {
+                toast.success('Profile updated successfully!');
                 form.password = '';
                 form.password_confirmation = '';
                 form.avatar_image = null;
                 form.remove_avatar = false;
+            },
+            onError: () => {
+                toast.error('Failed to update profile. Please check the form fields.');
             },
         },
     );
@@ -47,7 +52,7 @@ function submit() {
     <AppLayout
         :breadcrumbs="[{ title: 'My Profile', href: '/dashboard/profile' }]"
     >
-        <div class="mx-auto max-w-xl space-y-6 p-6">
+        <div class="mx-auto w-full space-y-6 p-6">
             <h1 class="text-2xl font-semibold">Edit Profile</h1>
 
             <form

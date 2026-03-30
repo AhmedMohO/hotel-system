@@ -3,19 +3,14 @@ import { Head, Link } from '@inertiajs/vue3';
 import {
     ArrowLeft,
     ShieldAlert,
+    ShieldCheck,
     Mail,
     Fingerprint,
     Calendar,
+    Hash,
+    UserCheck,
 } from 'lucide-vue-next';
-import { Badge } from '@/components/ui/badge';
-
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-    CardDescription,
-} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import UserAvatar from '@/components/UserAvatar.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
@@ -34,13 +29,10 @@ defineProps<{
         banned_at: string | null;
     };
 }>();
-
-// const page = usePage<{ auth: { user: { roles: string[] } } }>();
-// const isAdmin = computed(() => page.props.auth.user?.roles?.includes('admin'));
 </script>
 
 <template>
-    <Head :title="`Receptionist: ${receptionist.name}`" />
+    <Head :title="`${receptionist.name} — Receptionist`" />
 
     <AppLayout
         :breadcrumbs="[
@@ -48,212 +40,290 @@ defineProps<{
             { title: receptionist.name, href: '' },
         ]"
     >
-        <div
-            class="mx-auto min-h-screen max-w-7xl bg-muted/5 px-4 py-10 sm:px-6 lg:px-8"
-        >
-            <!-- Header -->
+        <div class="flex min-h-full flex-col">
+            <!-- Top bar -->
             <div
-                class="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"
+                class="flex shrink-0 items-center justify-between gap-4 border-b px-6 py-3.5"
             >
-                <div>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        class="mb-4 -ml-3 text-base font-semibold text-muted-foreground hover:text-foreground"
-                        as-child
-                    >
-                        <Link
-                            class="flex items-center"
-                            :href="Receptionists.index.url()"
-                        >
-                            <ArrowLeft class="mr-2 h-5 w-5" />
-                            Back to Receptionists
-                        </Link>
-                    </Button>
-                    <h1
-                        class="text-4xl font-extrabold tracking-tight text-foreground"
-                    >
-                        Receptionist Profile
-                    </h1>
-                    <p class="mt-2 text-base font-medium text-muted-foreground">
-                        Detailed information, creator link, and platform access
-                        status.
-                    </p>
-                </div>
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    class="-ml-2 gap-1.5 text-muted-foreground hover:text-foreground"
+                    as-child
+                >
+                    <Link :href="Receptionists.index.url()">
+                        <ArrowLeft class="h-4 w-4" />
+                        Receptionists
+                    </Link>
+                </Button>
 
-                <Badge
+                <span
                     v-if="receptionist.banned_at"
-                    variant="destructive"
-                    class="self-start rounded-none px-4 py-1 text-base font-bold tracking-widest uppercase shadow-none sm:self-auto"
+                    class="inline-flex items-center gap-1.5 rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700 dark:bg-red-950 dark:text-red-400"
                 >
-                    Account Suspended
-                </Badge>
-                <Badge
+                    <ShieldAlert class="h-3.5 w-3.5" />
+                    Banned
+                </span>
+                <span
                     v-else
-                    variant="outline"
-                    class="self-start rounded-none border-border bg-muted/20 px-4 py-1 text-base font-bold tracking-widest text-muted-foreground uppercase shadow-none sm:self-auto"
+                    class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400"
                 >
-                    Active Account
-                </Badge>
+                    <ShieldCheck class="h-3.5 w-3.5" />
+                    Active
+                </span>
             </div>
 
-            <!-- Main Content -->
-            <div class="grid grid-cols-1 gap-4 lg:grid-cols-4">
-                <!-- Left Column: Profile Card -->
-                <div class="lg:col-span-1">
-                    <Card class="rounded-xl border-border bg-card shadow-none">
-                        <CardContent
-                            class="flex flex-col items-center p-8 text-center"
-                        >
-                            <UserAvatar
-                                :user="receptionist"
-                                class="mb-6 h-40 w-40 shadow-none"
-                                :class="{
-                                    'opacity-75 grayscale':
-                                        receptionist.banned_at,
-                                }"
-                            />
-
-                            <h2 class="text-2xl font-bold text-foreground">
-                                {{ receptionist.name }}
-                            </h2>
-                            <p
-                                class="mt-1 text-base font-semibold text-muted-foreground"
-                            >
-                                Receptionist
-                            </p>
-
-                            <Separator class="my-8 w-full" />
-
-                            <div class="w-full space-y-5 text-left">
-                                <div
-                                    class="flex items-center text-base font-semibold text-muted-foreground"
-                                >
-                                    <Mail
-                                        class="mr-3 h-5 w-5 text-foreground/70"
-                                    />
-                                    <span class="truncate">{{
-                                        receptionist.email
-                                    }}</span>
-                                </div>
-                                <div
-                                    class="flex items-center text-base font-semibold text-muted-foreground"
-                                >
-                                    <Fingerprint
-                                        class="mr-3 h-5 w-5 text-foreground/70"
-                                    />
-                                    <span>{{ receptionist.national_id }}</span>
-                                </div>
-                                <div
-                                    class="flex items-center text-base font-semibold text-muted-foreground"
-                                >
-                                    <Calendar
-                                        class="mr-3 h-5 w-5 text-foreground/70"
-                                    />
-                                    <span
-                                        >Joined
-                                        {{
-                                            new Date(
-                                                receptionist.created_at,
-                                            ).toLocaleDateString()
-                                        }}</span
-                                    >
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
-
-                <!-- Right Column: Details -->
-                <div class="space-y-10 lg:col-span-3">
-                    <!-- Ban Notice -->
-                    <Card
-                        v-if="receptionist.banned_at"
-                        class="flex items-start gap-4 rounded-xl border-destructive/20 bg-destructive/5 p-6 text-destructive shadow-none"
+            <!-- Body: sidebar + main -->
+            <div class="flex flex-1 flex-col lg:flex-row">
+                <!-- Sidebar -->
+                <aside
+                    class="w-full shrink-0 border-b lg:w-72 lg:border-r lg:border-b-0 xl:w-80"
+                >
+                    <div
+                        class="flex flex-col items-center gap-4 px-8 py-10 text-center"
                     >
-                        <ShieldAlert
-                            class="mt-1 h-8 w-8 flex-shrink-0 text-destructive"
+                        <UserAvatar
+                            :user="receptionist"
+                            class="h-24 w-24 rounded-full ring-4 ring-border"
+                            :class="{
+                                'opacity-60 grayscale': receptionist.banned_at,
+                            }"
                         />
                         <div>
-                            <h3 class="text-xl font-bold">
-                                Platform Access Revoked
-                            </h3>
-                            <p class="mt-2 text-base font-medium opacity-90">
-                                This user's account was administratively banned
-                                on
+                            <h1 class="text-lg leading-tight font-semibold">
+                                {{ receptionist.name }}
+                            </h1>
+                            <p class="mt-1 text-sm text-muted-foreground">
+                                Receptionist
+                            </p>
+                        </div>
+                    </div>
+
+                    <Separator />
+
+                    <div class="flex flex-col divide-y">
+                        <div class="flex items-start gap-3 px-6 py-4">
+                            <Mail
+                                class="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground"
+                            />
+                            <div class="min-w-0">
+                                <p
+                                    class="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase"
+                                >
+                                    Email
+                                </p>
+                                <p class="mt-0.5 text-sm font-medium break-all">
+                                    {{ receptionist.email }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3 px-6 py-4">
+                            <Fingerprint
+                                class="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground"
+                            />
+                            <div>
+                                <p
+                                    class="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase"
+                                >
+                                    National ID
+                                </p>
+                                <p
+                                    class="mt-0.5 font-mono text-sm font-medium tracking-wide"
+                                >
+                                    {{ receptionist.national_id }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3 px-6 py-4">
+                            <Hash
+                                class="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground"
+                            />
+                            <div>
+                                <p
+                                    class="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase"
+                                >
+                                    System ID
+                                </p>
+                                <p class="mt-0.5 font-mono text-sm font-medium">
+                                    #{{ receptionist.id }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3 px-6 py-4">
+                            <Calendar
+                                class="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground"
+                            />
+                            <div>
+                                <p
+                                    class="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase"
+                                >
+                                    Joined
+                                </p>
+                                <p class="mt-0.5 text-sm font-medium">
+                                    {{
+                                        new Date(
+                                            receptionist.created_at,
+                                        ).toLocaleDateString('en-US', {
+                                            dateStyle: 'medium',
+                                        })
+                                    }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3 px-6 py-4">
+                            <UserCheck
+                                class="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground"
+                            />
+                            <div>
+                                <p
+                                    class="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase"
+                                >
+                                    Added By
+                                </p>
+                                <p class="mt-0.5 text-sm font-medium">
+                                    <span
+                                        v-if="!receptionist.created_by"
+                                        class="text-muted-foreground"
+                                        >System Admin</span
+                                    >
+                                    <Link
+                                        v-else
+                                        :href="
+                                            Managers.show.url(
+                                                receptionist.created_by.id,
+                                            )
+                                        "
+                                        class="text-primary underline underline-offset-4"
+                                    >
+                                        {{ receptionist.created_by.name }}
+                                    </Link>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Main -->
+                <main class="flex-1 px-6 py-8 lg:px-10">
+                    <!-- Ban alert -->
+                    <div
+                        v-if="receptionist.banned_at"
+                        class="mb-8 flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 px-5 py-4 dark:border-red-900 dark:bg-red-950/40"
+                    >
+                        <ShieldAlert
+                            class="mt-0.5 h-4 w-4 shrink-0 text-red-600 dark:text-red-400"
+                        />
+                        <div>
+                            <p
+                                class="text-sm font-semibold text-red-700 dark:text-red-400"
+                            >
+                                Platform access revoked
+                            </p>
+                            <p
+                                class="mt-0.5 text-sm text-red-600/80 dark:text-red-500"
+                            >
+                                This account was banned on
                                 {{
                                     new Date(
                                         receptionist.banned_at,
-                                    ).toLocaleString()
-                                }}. They cannot currently log into the platform.
+                                    ).toLocaleString('en-US', {
+                                        dateStyle: 'long',
+                                        timeStyle: 'short',
+                                    })
+                                }}. The user cannot log into the platform.
                             </p>
                         </div>
-                    </Card>
+                    </div>
 
-                    <Card
-                        class="rounded-xl border-border bg-card p-0 shadow-none"
-                    >
-                        <CardHeader
-                            class="border-b border-border bg-muted/30 px-8 py-6"
+                    <!-- Account Details -->
+                    <section>
+                        <h2
+                            class="mb-4 text-xs font-semibold tracking-wider text-muted-foreground uppercase"
                         >
-                            <CardTitle
-                                class="text-2xl font-bold text-foreground"
-                                >Account Information</CardTitle
+                            Account Details
+                        </h2>
+
+                        <div class="overflow-hidden rounded-xl border bg-card">
+                            <div
+                                class="grid grid-cols-1 divide-y sm:grid-cols-2 sm:divide-x sm:divide-y-0"
                             >
-                            <CardDescription
-                                class="mt-2 text-base font-medium text-muted-foreground"
-                            >
-                                Complete details of this receptionist's platform
-                                identity.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent class="p-8">
-                            <dl
-                                class="grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2"
-                            >
-                                <div>
-                                    <dt
-                                        class="text-sm font-bold tracking-widest text-muted-foreground uppercase"
+                                <div class="px-6 py-5">
+                                    <p
+                                        class="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase"
                                     >
                                         Full Name
-                                    </dt>
-                                    <dd
-                                        class="mt-2 text-xl font-bold text-foreground"
-                                    >
+                                    </p>
+                                    <p class="mt-1.5 text-base font-semibold">
                                         {{ receptionist.name }}
-                                    </dd>
+                                    </p>
                                 </div>
-                                <div>
-                                    <dt
-                                        class="text-sm font-bold tracking-widest text-muted-foreground uppercase"
+                                <div class="px-6 py-5">
+                                    <p
+                                        class="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase"
                                     >
                                         Email Address
-                                    </dt>
-                                    <dd
-                                        class="mt-2 text-xl font-bold text-foreground"
+                                    </p>
+                                    <p
+                                        class="mt-1.5 text-base font-semibold break-all"
                                     >
                                         {{ receptionist.email }}
-                                    </dd>
+                                    </p>
                                 </div>
+                            </div>
 
-                                <div class="sm:col-span-2">
-                                    <Separator class="my-2" />
+                            <Separator />
+
+                            <div
+                                class="grid grid-cols-1 divide-y sm:grid-cols-2 sm:divide-x sm:divide-y-0"
+                            >
+                                <div class="px-6 py-5">
+                                    <p
+                                        class="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase"
+                                    >
+                                        National ID
+                                    </p>
+                                    <p
+                                        class="mt-1.5 font-mono text-base font-semibold tracking-wide"
+                                    >
+                                        {{ receptionist.national_id }}
+                                    </p>
                                 </div>
+                                <div class="px-6 py-5">
+                                    <p
+                                        class="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase"
+                                    >
+                                        System ID
+                                    </p>
+                                    <p
+                                        class="mt-1.5 font-mono text-base font-semibold"
+                                    >
+                                        #{{ receptionist.id }}
+                                    </p>
+                                </div>
+                            </div>
 
-                                <div>
-                                    <dt
-                                        class="text-sm font-bold tracking-widest text-muted-foreground uppercase"
+                            <Separator />
+
+                            <div
+                                class="grid grid-cols-1 divide-y sm:grid-cols-2 sm:divide-x sm:divide-y-0"
+                            >
+                                <div class="px-6 py-5">
+                                    <p
+                                        class="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase"
                                     >
-                                        Created By
-                                    </dt>
-                                    <dd
-                                        class="mt-2 flex items-center gap-2 text-xl font-bold text-foreground"
-                                    >
+                                        Added By
+                                    </p>
+                                    <div class="mt-1.5">
                                         <span
                                             v-if="!receptionist.created_by"
-                                            class="text-muted-foreground"
-                                            >System Admin</span
+                                            class="text-base font-semibold text-muted-foreground"
                                         >
+                                            System Admin
+                                        </span>
                                         <Link
                                             v-else
                                             :href="
@@ -261,61 +331,33 @@ defineProps<{
                                                     receptionist.created_by.id,
                                                 )
                                             "
-                                            class="text-xl font-bold text-primary hover:text-primary/80 hover:underline"
+                                            class="text-base font-semibold text-primary underline underline-offset-4"
                                         >
                                             {{ receptionist.created_by.name }}
                                         </Link>
-                                    </dd>
+                                    </div>
                                 </div>
-                                <div>
-                                    <dt
-                                        class="text-sm font-bold tracking-widest text-muted-foreground uppercase"
+                                <div class="px-6 py-5">
+                                    <p
+                                        class="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase"
                                     >
                                         Account Created
-                                    </dt>
-                                    <dd
-                                        class="mt-2 text-xl font-bold text-foreground"
-                                    >
+                                    </p>
+                                    <p class="mt-1.5 text-base font-semibold">
                                         {{
                                             new Date(
                                                 receptionist.created_at,
-                                            ).toLocaleString()
+                                            ).toLocaleString('en-US', {
+                                                dateStyle: 'medium',
+                                                timeStyle: 'short',
+                                            })
                                         }}
-                                    </dd>
+                                    </p>
                                 </div>
-
-                                <div class="sm:col-span-2">
-                                    <Separator class="my-2" />
-                                </div>
-
-                                <div>
-                                    <dt
-                                        class="text-sm font-bold tracking-widest text-muted-foreground uppercase"
-                                    >
-                                        National ID
-                                    </dt>
-                                    <dd
-                                        class="mt-2 text-xl font-bold text-foreground"
-                                    >
-                                        {{ receptionist.national_id }}
-                                    </dd>
-                                </div>
-                                <div>
-                                    <dt
-                                        class="text-sm font-bold tracking-widest text-muted-foreground uppercase"
-                                    >
-                                        System ID
-                                    </dt>
-                                    <dd
-                                        class="mt-2 text-xl font-bold text-foreground"
-                                    >
-                                        #{{ receptionist.id }}
-                                    </dd>
-                                </div>
-                            </dl>
-                        </CardContent>
-                    </Card>
-                </div>
+                            </div>
+                        </div>
+                    </section>
+                </main>
             </div>
         </div>
     </AppLayout>

@@ -23,6 +23,7 @@ class ProfileController extends Controller
     public function edit(Request $request): Response
     {
         return Inertia::render('Dashboard/Profile/Edit', [
+            'user' => $request->user()->only('id', 'name', 'email', 'avatar_image'),
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => $request->session()->get('status'),
         ]);

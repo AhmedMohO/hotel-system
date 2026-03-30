@@ -1,8 +1,9 @@
 <?php
 
-use App\Http\Controllers\Admin\ClientsController;
 use App\Http\Controllers\Admin\ManagerController;
+use App\Http\Controllers\Admin\ClientsController;
 use App\Http\Controllers\Admin\ReceptionistController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Client\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Client\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Client\Auth\EmailVerificationController;
@@ -12,8 +13,6 @@ use App\Http\Controllers\Client\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Client\Auth\RegisteredClientController;
 use App\Http\Controllers\Client\ClientDashboardController;
 use App\Http\Controllers\Client\ReservationController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\Receptionist\ClientController as ReceptionistClientController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
@@ -25,14 +24,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'Dashboard/index')->name('dashboard');
 
     Route::prefix('dashboard')->group(function () {
-
-        // ── Admin only ────────────────────────────────────────────────────────
         Route::middleware('role:admin')->group(function () {
             Route::resource('managers', ManagerController::class)
                 ->only(['index', 'store', 'update', 'destroy', 'show']);
         });
 
-        // ── Admin & Manager ───────────────────────────────────────────────────
         Route::middleware('role:admin|manager')->group(function () {
             Route::resource('receptionists', ReceptionistController::class)
                 ->only(['index', 'store', 'update', 'destroy', 'show']);
@@ -42,10 +38,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 ->name('receptionists.unban');
         });
 
-        // ── Admin & Manager: Full Client CRUD ─────────────────────────────────
+
+        // Floors & Rooms — Dev 2
+        Route::middleware(['auth', 'role:admin|manager'])->group(function () {
+            Route::resource('floors', \App\Http\Controllers\Dashboard\FloorController::class)
+                ->except(['show']);
+            Route::resource('rooms', \App\Http\Controllers\Dashboard\RoomController::class)
+                ->except(['show']);
+        });
+    });
+
+
+     // ── Admin & Manager: Full Client CRUD ─────────────────────────────────
         // Route: /dashboard/clients
         Route::middleware('role:admin|manager')
-            ->prefix('clients')
+            ->prefix('dashboard/clients')
             ->name('dashboard.clients.')
             ->group(function () {
                 Route::get('/', [ClientsController::class, 'index'])->name('index');
@@ -65,7 +72,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // ── Receptionist: Limited Client Access ───────────────────────────────
         // Route: /dashboard/receptionist/clients
         Route::middleware('role:receptionist')
-            ->prefix('receptionist/clients')
+            ->prefix('dashboard/receptionist/clients')
             ->name('receptionist.clients.')
             ->group(function () {
                 // "Manage Clients" → unapproved clients list
@@ -85,49 +92,90 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 //     ->name('reservations');
             });
 
-        // ── Statistics API (Admin & Manager) ──────────────────────────────────
-        Route::middleware('role:admin|manager')->prefix('api')->group(function () {
-            Route::get('statistics', [DashboardController::class, 'statistics'])
-                ->name('dashboard.api.statistics');
-            Route::get('gender-distribution', [DashboardController::class, 'genderDistribution'])
-                ->name('dashboard.api.gender-distribution');
-            Route::get('reservations-revenue-monthly', [DashboardController::class, 'reservationsRevenueMonthly'])
-                ->name('dashboard.api.reservations-revenue-monthly');
-            Route::get('reservations-by-country', [DashboardController::class, 'reservationsByCountry'])
-                ->name('dashboard.api.reservations-by-country');
-            Route::get('top-reservation-clients', [DashboardController::class, 'topReservationClients'])
-                ->name('dashboard.api.top-reservation-clients');
+
+   
+
+
+    Route::inertia('dashboard/manage-clients', 'Dashboard/ManageClients/index')
+        ->name('dashboard.manage-clients');
+
+    Route::middleware('role:manager|admin')->get('dashboard/clients/export', [ClientsController::class, 'export'])
+        ->name('dashboard.clients.export');
+
+});
+
+
+
+Route::prefix('client')
+    ->name('client.')
+    ->group(function () {
+
+        Route::middleware('guest:client')->group(function () {
+            Route::get('register', [RegisteredClientController::class, 'create'])
+                ->name('register');
+            Route::post('register', [RegisteredClientController::class, 'store'])
+                ->name('register.store');
+
+            Route::get('login', [AuthenticatedSessionController::class, 'create'])
+                ->name('login');
+            Route::post('login', [AuthenticatedSessionController::class, 'store'])
+                ->name('login.store');
+
+            Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
+                ->name('password.request');
+            Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
+                ->name('password.email');
+
+            Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
+                ->name('password.reset');
+            Route::post('reset-password', [NewPasswordController::class, 'store'])
+                ->name('password.update');
+        });
+
+        // Auth only
+        Route::middleware('auth:client')->group(function () {
+            Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
+                ->name('logout');
+
+            Route::get('verify-email', [EmailVerificationController::class, 'notice'])
+                ->name('verification.notice');
+            Route::get('verify-email/{id}/{hash}', [EmailVerificationController::class, 'verify'])
+                ->middleware(['signed', 'throttle:6,1'])
+                ->name('verification.verify');
+            Route::post('email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
+                ->middleware('throttle:6,1')
+                ->name('verification.send');
+
+            Route::get('confirm-password', [ConfirmablePasswordController::class, 'show'])
+                ->name('password.confirm');
+            Route::post('confirm-password', [ConfirmablePasswordController::class, 'store'])
+                ->name('password.confirm.store');
+
+            // Client pages
+            Route::get('dashboard', [ClientDashboardController::class, 'index'])
+                ->name('dashboard');
+            Route::get('reservations', [ReservationController::class, 'index'])
+                ->name('reservations.index');
+            Route::get('reservations/rooms/{room}', [ReservationController::class, 'show'])
+                ->name('reservations.show');
+            Route::post('reservations/rooms/{room}', [ReservationController::class, 'store'])
+                ->name('reservations.store');
         });
     });
 
-    // ── Client (guest-facing) routes ──────────────────────────────────────────
-    Route::prefix('client')->name('client.')->group(function () {
 
-        Route::middleware('guest:client')->group(function () {
-            Route::get('register', [RegisteredClientController::class, 'create'])->name('register');
-            Route::post('register', [RegisteredClientController::class, 'store'])->name('register.store');
-            Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('login');
-            Route::post('login', [AuthenticatedSessionController::class, 'store'])->name('login.store');
-            Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])->name('password.request');
-            Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])->name('password.email');
-            Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])->name('password.reset');
-            Route::post('reset-password', [NewPasswordController::class, 'store'])->name('password.update');
-        });
-
-        Route::middleware('auth:client')->group(function () {
-            Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
-            Route::get('verify-email', [EmailVerificationController::class, 'notice'])->name('verification.notice');
-            Route::get('verify-email/{id}/{hash}', [EmailVerificationController::class, 'verify'])
-                ->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
-            Route::post('email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
-                ->middleware('throttle:6,1')->name('verification.send');
-            Route::get('confirm-password', [ConfirmablePasswordController::class, 'show'])->name('password.confirm');
-            Route::post('confirm-password', [ConfirmablePasswordController::class, 'store'])->name('password.confirm.store');
-            Route::get('dashboard', [ClientDashboardController::class, 'index'])->name('dashboard');
-            Route::get('reservations', [ReservationController::class, 'index'])->name('reservations.index');
-            Route::get('reservations/rooms/{room}', [ReservationController::class, 'show'])->name('reservations.show');
-            Route::post('reservations/rooms/{room}', [ReservationController::class, 'store'])->name('reservations.store');
-        });
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::middleware('role:admin|manager')->prefix('dashboard/api')->group(function () {
+        Route::get('statistics', [DashboardController::class, 'statistics'])
+            ->name('dashboard.api.statistics');
+        Route::get('gender-distribution', [DashboardController::class, 'genderDistribution'])
+            ->name('dashboard.api.gender-distribution');
+        Route::get('reservations-revenue-monthly', [DashboardController::class, 'reservationsRevenueMonthly'])
+            ->name('dashboard.api.reservations-revenue-monthly');
+        Route::get('reservations-by-country', [DashboardController::class, 'reservationsByCountry'])
+            ->name('dashboard.api.reservations-by-country');
+        Route::get('top-reservation-clients', [DashboardController::class, 'topReservationClients'])
+            ->name('dashboard.api.top-reservation-clients');
     });
 });
 

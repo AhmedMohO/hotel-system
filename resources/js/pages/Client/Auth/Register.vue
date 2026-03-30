@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
+import { toast } from 'vue-sonner';
 import AvatarUpload from '@/components/AvatarUpload.vue';
 import InputError from '@/components/InputError.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
@@ -20,7 +21,7 @@ import { login } from '@/routes/client';
 import { store } from '@/routes/client/register';
 
 defineProps<{
-    countries?: { name: string; iso2: string; emoji: string }[];
+    countries?: { name: string }[];
 }>();
 </script>
 
@@ -34,6 +35,10 @@ defineProps<{
         <Form
             v-bind="store.form()"
             :reset-on-success="['password', 'password_confirmation']"
+            @success="toast.success('Account created successfully!')"
+            @error="
+                toast.error('Registration failed. Please check your inputs.')
+            "
             v-slot="{ errors, processing }"
             class="flex flex-col gap-6"
         >
@@ -88,22 +93,22 @@ defineProps<{
                     <InputError :message="errors.mobile" />
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="grid gap-2">
+                <div class="flex gap-4">
+                    <div class="grid w-full gap-2">
                         <Label>Country</Label>
                         <Select name="country" required>
-                            <SelectTrigger tabindex="4">
-                                <SelectValue placeholder="Select country" />
+                            <SelectTrigger class="w-full" tabindex="4">
+                                <SelectValue
+                                    class=""
+                                    placeholder="Select country"
+                                />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent class="max-w-[220px]!">
                                 <SelectItem
                                     v-for="country in countries"
                                     :key="country.name"
                                     :value="country.name"
                                 >
-                                    <span class="mr-2">{{
-                                        country.emoji
-                                    }}</span>
                                     {{ country.name }}
                                 </SelectItem>
                             </SelectContent>
@@ -111,10 +116,10 @@ defineProps<{
                         <InputError :message="errors.country" />
                     </div>
 
-                    <div class="grid gap-2">
+                    <div class="grid w-full gap-2">
                         <Label>Gender</Label>
                         <Select name="gender" required>
-                            <SelectTrigger tabindex="5">
+                            <SelectTrigger class="w-full" tabindex="5">
                                 <SelectValue placeholder="Select gender" />
                             </SelectTrigger>
                             <SelectContent>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { router } from '@inertiajs/vue3';
 import { ref } from 'vue';
+import { toast } from 'vue-sonner';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -29,6 +30,7 @@ const props = defineProps<{
     triggerLabel?: string;
     triggerIcon?: any;
     triggerTooltip?: string;
+    triggerClass?: any;
     triggerVariant?:
         | 'destructive'
         | 'outline'
@@ -37,6 +39,7 @@ const props = defineProps<{
         | 'default';
     confirmLabel?: string;
     confirmVariant?: 'destructive' | 'default';
+    successMessage?: string;
 }>();
 
 const emit = defineEmits<{
@@ -46,14 +49,43 @@ const emit = defineEmits<{
 const open = ref(false);
 const processing = ref(false);
 
+// async function confirm() {
+//     processing.value = true;
+//     router.visit(props.url, {
+//         method: props.method ?? 'delete',
+//         preserveState: false,
+//         onSuccess: () => {
+//             const message = props.successMessage ?? `${props.title?.replace('?', '') ?? 'Action'} completed successfully!`;
+//             toast.success(message);
+//             emit('success');
+//             open.value = false;
+//         },
+//         onError: () => {
+//             toast.error('Action failed. Please try again.');
+//         },
+//         onFinish: () => {
+//             processing.value = false;
+//         },
+//     });
+// }
+
 async function confirm() {
     processing.value = true;
     router.visit(props.url, {
         method: props.method ?? 'delete',
         preserveState: false,
-        onSuccess: () => {
+        onSuccess: (page) => {
+            const flash = (page.props as any).flash;
+            if (flash?.error) {
+                toast.error(flash.error);
+            } else {
+                toast.success(flash?.success ?? `${props.title?.replace('?', '') ?? 'Action'} completed successfully!`);
+            }
             emit('success');
             open.value = false;
+        },
+        onError: () => {
+            toast.error('Action failed. Please try again.');
         },
         onFinish: () => {
             processing.value = false;
@@ -70,7 +102,11 @@ async function confirm() {
                     <Tooltip>
                         <TooltipTrigger as-child>
                             <AlertDialogTrigger as-child>
-                                <Button :variant="triggerVariant ?? 'ghost'" size="icon" class="h-8 w-8">
+                                <Button
+                                    :variant="triggerVariant ?? 'ghost'"
+                                    size="icon"
+                                    :class="['h-8 w-8', triggerClass]"
+                                >
                                     <component :is="triggerIcon" class="h-4 w-4" />
                                 </Button>
                             </AlertDialogTrigger>
@@ -83,7 +119,7 @@ async function confirm() {
             </template>
             <template v-else>
                 <AlertDialogTrigger as-child>
-                    <Button :variant="triggerVariant ?? 'destructive'" size="sm">
+                    <Button :variant="triggerVariant ?? 'destructive'" size="sm" :class="triggerClass">
                         {{ triggerLabel ?? 'Delete' }}
                     </Button>
                 </AlertDialogTrigger>

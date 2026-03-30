@@ -9,15 +9,22 @@ use Inertia\Inertia;
 
 class ClientDashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $availableRooms = Room::whereDoesntHave('reservations')
-            ->with('floor')
-            ->paginate(10);
+        $checkIn  = $request->query('check_in',  now()->toDateString());
+        $checkOut = $request->query('check_out', now()->addDay()->toDateString());
+
+        $availableRooms = Room::whereDoesntHave('reservations', function ($query) use ($checkIn, $checkOut) {
+            $query->where('check_in',  '<', $checkOut)
+                ->where('check_out', '>',  $checkIn);
+        })->with('floor')->paginate(10);
 
         return Inertia::render('Client/Dashboard', [
-            'rooms' => $availableRooms,
+            'rooms'    => $availableRooms,
+            'checkIn'  => $checkIn,
+            'checkOut' => $checkOut,
         ]);
     }
+
 
 }
