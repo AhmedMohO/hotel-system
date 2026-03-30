@@ -196,7 +196,8 @@
 
 <script setup lang="ts">
 import { Link, useForm } from '@inertiajs/vue3';
-import AppLayout from '@/layouts/app/AppSidebarLayout.vue';
+import { toast } from 'vue-sonner';
+import AppLayout from '@/layouts/AppLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -217,7 +218,11 @@ const form = useForm({
 
 function submit() {
     form.post('/dashboard/clients', {
-        onSuccess: () => form.reset(),
+        onSuccess: () => {
+            toast.success('Client created successfully.');
+            form.reset();
+        },
+        onError: () => toast.error('Failed to create client. Please check the form.'),
     });
 }
 </script>

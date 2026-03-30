@@ -1,212 +1,8 @@
-<template>
-    <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="min-h-screen bg-slate-50">
-            <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-                <!-- Header -->
-                <div class="mb-6">
-                    <h1
-                        class="text-2xl font-bold tracking-tight text-slate-900"
-                    >
-                        Manage Clients
-                    </h1>
-                    <p class="mt-1 text-sm text-slate-500">
-                        Manage and approve client accounts
-                    </p>
-                </div>
-
-                <!-- Internal Tab Navigation -->
-                <div
-                    class="mb-6 flex w-fit gap-1 rounded-xl border border-slate-200 bg-white p-1 shadow-sm"
-                >
-                    <Link
-                        href="/dashboard/receptionist/clients"
-                        class="rounded-lg px-4 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100"
-                    >
-                        Unapproved Clients
-                    </Link>
-                    <Link
-                        href="/dashboard/receptionist/clients/my-approved"
-                        class="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors"
-                    >
-                        My Approved Clients
-                    </Link>
-                    <!-- <Link
-                        href="/dashboard/receptionist/clients/reservations"
-                        class="rounded-lg px-4 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100"
-                    >
-                        Clients Reservations
-                    </Link> -->
-                </div>
-
-                <!-- Table -->
-                <div
-                    class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
-                >
-                    <table class="min-w-full divide-y divide-slate-100">
-                        <thead class="bg-slate-50/80">
-                            <tr>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold tracking-wider text-slate-500 uppercase"
-                                >
-                                    Client Name
-                                </th>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold tracking-wider text-slate-500 uppercase"
-                                >
-                                    Email
-                                </th>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold tracking-wider text-slate-500 uppercase"
-                                >
-                                    Mobile
-                                </th>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold tracking-wider text-slate-500 uppercase"
-                                >
-                                    Country
-                                </th>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold tracking-wider text-slate-500 uppercase"
-                                >
-                                    Gender
-                                </th>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold tracking-wider text-slate-500 uppercase"
-                                >
-                                    Approved At
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-50">
-                            <tr v-if="clients.data.length === 0">
-                                <td colspan="6" class="px-6 py-20 text-center">
-                                    <div
-                                        class="flex flex-col items-center gap-2 text-slate-400"
-                                    >
-                                        <svg
-                                            class="h-12 w-12 text-slate-200"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                stroke-width="1.5"
-                                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
-                                            />
-                                        </svg>
-                                        <p class="text-sm font-medium">
-                                            You haven't approved any clients
-                                            yet.
-                                        </p>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <tr
-                                v-for="client in clients.data"
-                                :key="client.id"
-                                class="transition-colors hover:bg-slate-50/60"
-                            >
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <img
-                                            :src="
-                                                client.avatar_image
-                                                    ? '/storage/' +
-                                                      client.avatar_image
-                                                    : '/images/avatar.jpg'
-                                            "
-                                            alt=""
-                                            class="h-9 w-9 flex-shrink-0 rounded-full object-cover ring-2 ring-emerald-100"
-                                        />
-                                        <div>
-                                            <p
-                                                class="text-sm font-semibold text-slate-900"
-                                            >
-                                                {{ client.name }}
-                                            </p>
-                                            <span
-                                                class="inline-flex items-center gap-1 text-xs font-medium text-emerald-600"
-                                            >
-                                                <span
-                                                    class="h-1.5 w-1.5 rounded-full bg-emerald-500"
-                                                />
-                                                Approved
-                                            </span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-sm text-slate-600">
-                                    {{ client.email }}
-                                </td>
-                                <td class="px-6 py-4 text-sm text-slate-600">
-                                    {{ client.mobile }}
-                                </td>
-                                <td class="px-6 py-4 text-sm text-slate-600">
-                                    {{ client.country }}
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span
-                                        class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
-                                        :class="
-                                            client.gender === 'Male'
-                                                ? 'bg-blue-50 text-blue-600'
-                                                : 'bg-pink-50 text-pink-600'
-                                        "
-                                    >
-                                        {{ client.gender }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 text-sm text-slate-500">
-                                    {{ formatDate(client.approved_at) }}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <!-- Pagination -->
-                    <div
-                        v-if="clients.last_page > 1"
-                        class="flex items-center justify-between border-t border-slate-100 px-6 py-4"
-                    >
-                        <p class="text-sm text-slate-500">
-                            Showing {{ clients.from }}–{{ clients.to }} of
-                            {{ clients.total }}
-                        </p>
-                        <div class="flex gap-1">
-                            <template
-                                v-for="link in clients.links"
-                                :key="link.label"
-                            >
-                                <a
-                                    v-if="link.url"
-                                    :href="link.url"
-                                    v-html="link.label"
-                                    :class="[
-                                        'rounded-lg px-3 py-1.5 text-sm transition-colors',
-                                        link.active
-                                            ? 'bg-slate-900 font-semibold text-white'
-                                            : 'text-slate-600 hover:bg-slate-100',
-                                    ]"
-                                />
-                                <span
-                                    v-else
-                                    v-html="link.label"
-                                    class="rounded-lg px-3 py-1.5 text-sm text-slate-400 opacity-40"
-                                />
-                            </template>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </AppLayout>
-</template>
-
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
+import type { ColumnDef } from '@tanstack/vue-table';
+import { h } from 'vue';
+import DataTable from '@/components/DataTable.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 
@@ -222,27 +18,42 @@ type Client = {
 };
 
 type PaginationLink = { label: string; url: string | null; active: boolean };
-
 type Pagination = {
     data: Client[];
+    current_page: number;
     from: number;
     to: number;
     total: number;
     last_page: number;
+    per_page: number;
     links: PaginationLink[];
 };
 
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Dashboard', href: '/dashboard' },
-    { title: 'Manage Clients', href: '/dashboard/receptionist/clients' },
-    {
-        title: 'My Approved Clients',
-        href: '/dashboard/receptionist/clients/my-approved',
-    },
-];
+// ── Props ─────────────────────────────────────────────────────────────────────
+const { clients, filters, backHref } = defineProps<{
+    clients: Pagination;
+    filters?: Record<string, any>;
+    backHref?: string;
+}>();
 
-const { clients } = defineProps<{ clients: Pagination }>();
+// ── Breadcrumbs ───────────────────────────────────────────────────────────────
+const isReceptionist = backHref === '/dashboard/receptionist/clients';
+const breadcrumbs: BreadcrumbItem[] = isReceptionist
+    ? [
+          { title: 'Dashboard', href: '/dashboard' },
+          { title: 'Manage Clients', href: '/dashboard/receptionist/clients' },
+          {
+              title: 'My Approved Clients',
+              href: '/dashboard/receptionist/clients/my-approved',
+          },
+      ]
+    : [
+          { title: 'Dashboard', href: '/dashboard' },
+          { title: 'Manage Clients', href: '/dashboard/clients' },
+          { title: 'Approved Clients', href: '/dashboard/clients/my-approved' },
+      ];
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
 function formatDate(dateStr: string) {
     return new Date(dateStr).toLocaleDateString('en-US', {
         year: 'numeric',
@@ -250,4 +61,163 @@ function formatDate(dateStr: string) {
         day: 'numeric',
     });
 }
+
+// ── Columns ───────────────────────────────────────────────────────────────────
+const columns: ColumnDef<Client, any>[] = [
+    {
+        id: 'client',
+        header: 'Client',
+        enableSorting: false,
+        cell: ({ row }) =>
+            h('div', { class: 'flex items-center gap-3' }, [
+                h('img', {
+                    src: row.original.avatar_image
+                        ? '/storage/' + row.original.avatar_image
+                        : '/images/avatar.jpg',
+                    alt: '',
+                    class: 'h-9 w-9 flex-shrink-0 rounded-full object-cover ring-2 ring-primary/20',
+                }),
+                h('div', {}, [
+                    h(
+                        'p',
+                        { class: 'text-sm font-semibold text-foreground' },
+                        row.original.name,
+                    ),
+                    h(
+                        'span',
+                        {
+                            class: 'inline-flex items-center gap-1 text-xs font-medium text-primary',
+                        },
+                        [
+                            h('span', {
+                                class: 'h-1.5 w-1.5 rounded-full bg-primary',
+                            }),
+                            'Approved',
+                        ],
+                    ),
+                ]),
+            ]),
+    },
+    {
+        accessorKey: 'email',
+        header: 'Email',
+        enableSorting: false,
+        cell: ({ row }) =>
+            h(
+                'span',
+                { class: 'text-sm text-muted-foreground' },
+                row.original.email,
+            ),
+    },
+    {
+        accessorKey: 'mobile',
+        header: 'Mobile',
+        enableSorting: false,
+        cell: ({ row }) =>
+            h(
+                'span',
+                { class: 'text-sm text-muted-foreground' },
+                row.original.mobile,
+            ),
+    },
+    {
+        accessorKey: 'country',
+        header: 'Country',
+        enableSorting: false,
+        cell: ({ row }) =>
+            h(
+                'span',
+                { class: 'text-sm text-foreground' },
+                row.original.country,
+            ),
+    },
+    {
+        accessorKey: 'gender',
+        header: 'Gender',
+        enableSorting: false,
+        cell: ({ row }) =>
+            h(
+                'span',
+                {
+                    class: [
+                        'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium',
+                        row.original.gender === 'Male'
+                            ? 'bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-300'
+                            : 'bg-pink-50 text-pink-600 dark:bg-pink-950 dark:text-pink-300',
+                    ],
+                },
+                row.original.gender,
+            ),
+    },
+    {
+        accessorKey: 'approved_at',
+        header: 'Approved At',
+        enableSorting: false,
+        cell: ({ row }) =>
+            h(
+                'span',
+                { class: 'text-sm text-muted-foreground' },
+                formatDate(row.original.approved_at),
+            ),
+    },
+];
 </script>
+
+<template>
+    <AppLayout :breadcrumbs="breadcrumbs">
+        <div class="min-h-screen bg-background">
+            <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+                <!-- Header -->
+                <div class="mb-6 flex items-center gap-4">
+                    <Link
+                        :href="backHref ?? '/dashboard/clients'"
+                        class="rounded-xl border border-transparent p-2 text-muted-foreground transition-all hover:border-border hover:bg-card hover:text-foreground"
+                    >
+                        <svg
+                            class="h-5 w-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M15 19l-7-7 7-7"
+                            />
+                        </svg>
+                    </Link>
+                    <div>
+                        <h1
+                            class="text-2xl font-bold tracking-tight text-foreground"
+                        >
+                            {{
+                                isReceptionist
+                                    ? 'My Approved Clients'
+                                    : 'Approved Clients'
+                            }}
+                        </h1>
+                        <p class="mt-1 text-sm text-muted-foreground">
+                            <span class="font-semibold text-primary">{{
+                                clients.total
+                            }}</span>
+                            approved client{{ clients.total !== 1 ? 's' : '' }}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- DataTable -->
+                <div
+                    class="rounded-2xl border border-border bg-card p-4 shadow-sm"
+                >
+                    <DataTable
+                        :data="clients"
+                        :columns="columns"
+                        :filters="filters"
+                        search-placeholder="Search by name..."
+                    />
+                </div>
+            </div>
+        </div>
+    </AppLayout>
+</template>

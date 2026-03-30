@@ -19,32 +19,74 @@ class ClientsController extends Controller
     /**
      * GET /dashboard/clients
      */
-public function index(): Response
-{
-    // REMOVED: ->whereNotNull('approved_at')
-    $clients = Client::with('approvedBy:id,name')
-        ->select(['id', 'name', 'email', 'avatar_image', 'country', 'gender', 'approved_at', 'approved_by', 'created_at'])
-        ->latest()
-        ->paginate(10)
-        ->withQueryString();
+    public function index(Request $request): Response
+    {
+        $filters = $request->only(['filter', 'per_page', 'page', 'sort']);
 
-    return Inertia::render('Dashboard/ManageClients/index', [
-        'clients' => $clients,
-    ]);
-}
+        $query = Client::with('approvedBy:id,name')
+            ->select(['id', 'name', 'email', 'avatar_image', 'country', 'gender', 'approved_at', 'approved_by', 'created_at'])
+            ->latest();
+
+        if ($search = $request->input('filter.name')) {
+            $query->where('name', 'like', "%{$search}%");
+        }
+
+        $perPage = (int) $request->input('per_page', 10);
+        $clients = $query->paginate($perPage)->withQueryString();
+
+        return Inertia::render('Dashboard/ManageClients/index', [
+            'clients' => $clients,
+            'filters' => $filters,
+        ]);
+    }
+
     /**
      * GET /dashboard/clients/pending
      */
-    public function pending(): Response
+    public function pending(Request $request): Response
     {
-        $clients = Client::whereNull('approved_at')
+        $filters = $request->only(['filter', 'per_page', 'page', 'sort']);
+
+        $query = Client::whereNull('approved_at')
             ->select(['id', 'name', 'email', 'avatar_image', 'country', 'gender', 'mobile', 'created_at'])
-            ->latest()
-            ->paginate(10)
-            ->withQueryString();
+            ->latest();
+
+        if ($search = $request->input('filter.name')) {
+            $query->where('name', 'like', "%{$search}%");
+        }
+
+        $perPage = (int) $request->input('per_page', 10);
+        $clients = $query->paginate($perPage)->withQueryString();
 
         return Inertia::render('Dashboard/ManageClients/Pending', [
             'clients' => $clients,
+            'filters' => $filters,
+        ]);
+    }
+
+    /**
+     * GET /dashboard/clients/my-approved
+     * For admin/manager: all approved clients.
+     */
+    public function myApproved(Request $request): Response
+    {
+        $filters = $request->only(['filter', 'per_page', 'page', 'sort']);
+
+        $query = Client::whereNotNull('approved_at')
+            ->select(['id', 'name', 'email', 'mobile', 'country', 'gender', 'avatar_image', 'approved_at'])
+            ->latest('approved_at');
+
+        if ($search = $request->input('filter.name')) {
+            $query->where('name', 'like', "%{$search}%");
+        }
+
+        $perPage = (int) $request->input('per_page', 10);
+        $clients = $query->paginate($perPage)->withQueryString();
+
+        return Inertia::render('Receptionist/Clients/MyApproved', [
+            'clients'  => $clients,
+            'filters'  => $filters,
+            'backHref' => '/dashboard/clients',
         ]);
     }
 
@@ -99,22 +141,20 @@ public function index(): Response
         return back()->with('success', "{$client->name} has been approved successfully.");
     }
 
-
-     /**
-        * PATCH /dashboard/clients/{client}/unapprove
-        */
+    /**
+     * PATCH /dashboard/clients/{client}/unapprove
+     */
     public function unapprove(Client $client): RedirectResponse
-        {
-            abort_unless($client->approved_at, 422, 'Client is not approved.');
+    {
+        abort_unless($client->approved_at, 422, 'Client is not approved.');
 
-            $client->update([
-                'approved_by' => null,
-                'approved_at' => null,
-            ]);
+        $client->update([
+            'approved_by' => null,
+            'approved_at' => null,
+        ]);
 
-            return back()->with('success', "{$client->name} has been unapproved.");
-        }
-        
+        return back()->with('success', "{$client->name} has been unapproved.");
+    }
 
     /**
      * GET /dashboard/clients/{client}
@@ -159,6 +199,7 @@ public function index(): Response
 
     /**
      * DELETE /dashboard/clients/{client}
+     * Soft-deletes the client (sets deleted_at).
      */
     public function destroy(Client $client): RedirectResponse
     {
@@ -169,14 +210,10 @@ public function index(): Response
     }
 
     /**
-     * GET /dashboard/clients/export/csv
+     * GET /dashboard/clients/export/excel
      */
     public function export()
     {
         return Excel::download(new ClientsExport, 'clients.xlsx');
     }
-
-
-
-   
 }

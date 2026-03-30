@@ -15,6 +15,7 @@ use App\Http\Controllers\Client\ClientDashboardController;
 use App\Http\Controllers\Client\ReservationController;
 use App\Http\Controllers\Receptionist\ClientController as ReceptionistClientController;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 use Laravel\Fortify\Features;
 
 Route::inertia('/', 'Welcome', [
@@ -22,7 +23,7 @@ Route::inertia('/', 'Welcome', [
 ])->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'Dashboard/index')->name('dashboard');
+    Route::middleware(['role:admin|manager'])->get('dashboard', fn () => Inertia::render('Dashboard/index'))->name('dashboard');
 
     Route::prefix('dashboard')->group(function () {
         Route::middleware('role:admin')->group(function () {
@@ -58,9 +59,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->group(function () {
                 Route::get('/', [ClientsController::class, 'index'])->name('index');
                 Route::get('pending', [ClientsController::class, 'pending'])->name('pending');
+                Route::get('my-approved', [ClientsController::class, 'myApproved'])->name('my-approved');
                 Route::get('export/excel', [ClientsController::class, 'export'])->name('export');
                 Route::post('{client}/approve', [ClientsController::class, 'approve'])->name('approve');
-                Route::patch('{client}/unapprove', [ClientsController::class, 'unapprove'])->name('unapprove'); // NEW
+                Route::patch('{client}/unapprove', [ClientsController::class, 'unapprove'])->name('unapprove');
                 Route::get('create', [ClientsController::class, 'create'])->name('create');
                 Route::post('/', [ClientsController::class, 'store'])->name('store');
                 Route::get('{client}/edit', [ClientsController::class, 'edit'])->name('edit');
@@ -87,21 +89,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 // "My Approved Clients" tab/page
                 Route::get('my-approved', [ReceptionistClientController::class, 'myApproved'])
                     ->name('my-approved');
-
-                // "Clients Reservations" tab/page
-                // Route::get('reservations', [ReceptionistClientController::class, 'reservations'])
-                //     ->name('reservations');
             });
-
-
-   
-
-
-    Route::inertia('dashboard/manage-clients', 'Dashboard/ManageClients/index')
-        ->name('dashboard.manage-clients');
-
-    Route::middleware('role:manager|admin')->get('dashboard/clients/export', [ClientsController::class, 'export'])
-        ->name('dashboard.clients.export');
 
 });
 

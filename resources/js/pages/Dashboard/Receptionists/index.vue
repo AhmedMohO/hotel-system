@@ -210,68 +210,73 @@ const columns: ColumnDef<Receptionist, any>[] = [
     },
     {
         id: 'actions',
-        header: '',
+        header: () =>
+            h('div', { class: 'text-center justify-center flex-1' }, 'Actions'),
         enableSorting: false,
         cell: ({ row }) => {
             const r = row.original;
 
-            return h('div', { class: 'flex items-center justify-end gap-1' }, [
-                h(ActionIcon, {
-                    icon: Eye,
-                    tooltip: 'View profile',
-                    class: 'text-sky-600 hover:bg-sky-50 hover:text-sky-700 dark:text-sky-400 dark:hover:bg-sky-950/60 dark:hover:text-sky-300',
-                    href: Receptionists.show.url(r.id),
-                }),
-                ...(r.can_manage
-                    ? [
-                          h(ActionIcon, {
-                              icon: Pencil,
-                              tooltip: 'Edit',
-                              class: 'text-amber-600 hover:bg-amber-50 hover:text-amber-700 dark:text-amber-400 dark:hover:bg-amber-950/60 dark:hover:text-amber-300',
-                              onClick: () => openEdit(r),
-                          }),
-                          r.banned_at
-                              ? h(ConfirmDialog, {
-                                    url: Receptionists.unban.url(r.id),
-                                    method: 'patch',
-                                    title: 'Unban Receptionist?',
-                                    description: `Allow ${r.name} to log in again?`,
-                                    triggerLabel: 'Unban',
-                                    triggerIcon: ShieldCheck,
-                                    triggerTooltip: 'Unban',
-                                    triggerClass:
-                                        'text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700 dark:text-emerald-400 dark:hover:bg-emerald-950/60 dark:hover:text-emerald-300',
-                                    confirmLabel: 'Unban',
-                                })
-                              : h(ConfirmDialog, {
-                                    url: Receptionists.ban.url(r.id),
-                                    method: 'patch',
-                                    title: 'Ban Receptionist?',
-                                    description: `Prevent ${r.name} from logging in?`,
-                                    triggerLabel: 'Ban',
-                                    triggerIcon: ShieldAlert,
-                                    triggerTooltip: 'Ban',
-                                    triggerClass:
-                                        'text-orange-600 hover:bg-orange-50 hover:text-orange-700 dark:text-orange-400 dark:hover:bg-orange-950/60 dark:hover:text-orange-300',
-                                    confirmLabel: 'Ban',
-                                    confirmVariant: 'destructive',
-                                }),
-                          h(ConfirmDialog, {
-                              url: Receptionists.destroy.url(r.id),
-                              method: 'delete',
-                              title: 'Delete Receptionist?',
-                              description: `Delete ${r.name}? Their account will be soft-deleted.`,
-                              triggerLabel: 'Delete',
-                              triggerIcon: Trash2,
-                              triggerTooltip: 'Delete',
-                              triggerClass:
-                                  'text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-950/60 dark:hover:text-red-300',
-                              confirmLabel: 'Delete',
-                              confirmVariant: 'destructive',
-                          }),
-                      ]
-                    : []),
-            ]);
+            return h(
+                'div',
+                { class: 'flex items-center justify-center gap-1' },
+                [
+                    h(ActionIcon, {
+                        icon: Eye,
+                        tooltip: 'View profile',
+                        class: 'text-sky-600 hover:bg-sky-50 hover:text-sky-700 dark:text-sky-400 dark:hover:bg-sky-950/60 dark:hover:text-sky-300',
+                        href: Receptionists.show.url(r.id),
+                    }),
+                    ...(r.can_manage
+                        ? [
+                              h(ActionIcon, {
+                                  icon: Pencil,
+                                  tooltip: 'Edit',
+                                  class: 'text-amber-600 hover:bg-amber-50 hover:text-amber-700 dark:text-amber-400 dark:hover:bg-amber-950/60 dark:hover:text-amber-300',
+                                  onClick: () => openEdit(r),
+                              }),
+                              r.banned_at
+                                  ? h(ConfirmDialog, {
+                                        url: Receptionists.unban.url(r.id),
+                                        method: 'patch',
+                                        title: 'Unban Receptionist?',
+                                        description: `Allow ${r.name} to log in again?`,
+                                        triggerLabel: 'Unban',
+                                        triggerIcon: ShieldCheck,
+                                        triggerTooltip: 'Unban',
+                                        triggerClass:
+                                            'text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700 dark:text-emerald-400 dark:hover:bg-emerald-950/60 dark:hover:text-emerald-300',
+                                        confirmLabel: 'Unban',
+                                    })
+                                  : h(ConfirmDialog, {
+                                        url: Receptionists.ban.url(r.id),
+                                        method: 'patch',
+                                        title: 'Ban Receptionist?',
+                                        description: `Prevent ${r.name} from logging in?`,
+                                        triggerLabel: 'Ban',
+                                        triggerIcon: ShieldAlert,
+                                        triggerTooltip: 'Ban',
+                                        triggerClass:
+                                            'text-orange-600 hover:bg-orange-50 hover:text-orange-700 dark:text-orange-400 dark:hover:bg-orange-950/60 dark:hover:text-orange-300',
+                                        confirmLabel: 'Ban',
+                                        confirmVariant: 'destructive',
+                                    }),
+                              h(ConfirmDialog, {
+                                  url: Receptionists.destroy.url(r.id),
+                                  method: 'delete',
+                                  title: 'Delete Receptionist?',
+                                  description: `Delete ${r.name}? if there are any linked data to this receptionist, the account will be soft-deleted.`,
+                                  triggerLabel: 'Delete',
+                                  triggerIcon: Trash2,
+                                  triggerTooltip: 'Delete',
+                                  triggerClass:
+                                      'text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-950/60 dark:hover:text-red-300',
+                                  confirmLabel: 'Delete',
+                                  confirmVariant: 'destructive',
+                              }),
+                          ]
+                        : []),
+                ],
+            );
         },
     },
 ];

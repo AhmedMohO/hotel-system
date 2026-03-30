@@ -209,51 +209,18 @@
 
                             <!-- Approve Button -->
                             <td class="px-6 py-4 text-right">
-                                <button
-                                    @click="approve(client)"
-                                    :disabled="approvingId === client.id"
-                                    class="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-emerald-700 disabled:bg-emerald-400"
-                                >
-                                    <svg
-                                        v-if="approvingId !== client.id"
-                                        class="h-3.5 w-3.5"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2.5"
-                                            d="M5 13l4 4L19 7"
-                                        />
-                                    </svg>
-                                    <svg
-                                        v-else
-                                        class="h-3.5 w-3.5 animate-spin"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <circle
-                                            class="opacity-25"
-                                            cx="12"
-                                            cy="12"
-                                            r="10"
-                                            stroke="currentColor"
-                                            stroke-width="4"
-                                        />
-                                        <path
-                                            class="opacity-75"
-                                            fill="currentColor"
-                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                                        />
-                                    </svg>
-                                    {{
-                                        approvingId === client.id
-                                            ? 'Approving…'
-                                            : 'Approve'
-                                    }}
-                                </button>
+                                <ConfirmDialog
+                                    :url="`/dashboard/clients/${client.id}/approve`"
+                                    method="post"
+                                    title="Approve Client?"
+                                    :description="`Approve ${client.name}? They will gain access to the platform.`"
+                                    triggerLabel="Approve"
+                                    triggerVariant="default"
+                                    triggerClass="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-emerald-700 hover:text-white"
+                                    confirmLabel="Yes, Approve"
+                                    confirmVariant="default"
+                                    :successMessage="`${client.name} has been approved successfully.`"
+                                />
                             </td>
                         </tr>
                     </tbody>
@@ -293,26 +260,10 @@
 </template>
 
 <script setup>
-import { Link, router } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { Link } from '@inertiajs/vue3';
+import ConfirmDialog from '@/components/ConfirmDialog.vue';
 
 defineProps({ clients: Object });
-
-const approvingId = ref(null);
-
-function approve(client) {
-    approvingId.value = client.id;
-    router.post(
-        `/dashboard/clients/${client.id}/approve`,
-        {},
-        {
-            preserveScroll: true,
-            onFinish: () => {
-                approvingId.value = null;
-            },
-        },
-    );
-}
 
 function formatDate(dateStr) {
     return new Date(dateStr).toLocaleDateString('en-US', {

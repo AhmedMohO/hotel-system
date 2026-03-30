@@ -37,9 +37,15 @@ const isManager = computed(() => roles.value.includes('manager'));
 const isReceptionist = computed(() => roles.value.includes('receptionist'));
 
 const mainNavItems = computed<NavItem[]>(() => {
-    const items: NavItem[] = [
-        { title: 'Dashboard', href: dashboard(), icon: LayoutDashboard },
-    ];
+    const items: NavItem[] = [];
+
+    if (!isReceptionist.value) {
+        items.push({
+            title: 'Dashboard',
+            href: dashboard(),
+            icon: LayoutDashboard,
+        });
+    }
 
     if (isAdmin.value) {
         items.push({
@@ -71,7 +77,9 @@ const mainNavItems = computed<NavItem[]>(() => {
 
     items.push({
         title: 'Manage Clients',
-        href: isReceptionist.value ? '/dashboard/receptionist/clients' : '/dashboard/clients',
+        href: isReceptionist.value
+            ? '/dashboard/receptionist/clients'
+            : '/dashboard/clients',
         icon: UserRound,
     });
 
@@ -89,7 +97,13 @@ const footerNavItems: NavItem[] = [
             <SidebarMenu>
                 <SidebarMenuItem>
                     <SidebarMenuButton size="lg" as-child>
-                        <Link :href="dashboard()">
+                        <Link
+                            :href="
+                                isReceptionist
+                                    ? '/dashboard/receptionist/clients'
+                                    : dashboard()
+                            "
+                        >
                             <AppLogo />
                         </Link>
                     </SidebarMenuButton>

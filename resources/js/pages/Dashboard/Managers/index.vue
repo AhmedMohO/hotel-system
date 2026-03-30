@@ -157,41 +157,46 @@ const columns: ColumnDef<Manager, any>[] = [
     },
     {
         id: 'actions',
-        header: '',
+        header: () =>
+            h('div', { class: 'text-center justify-center flex-1' }, 'Actions'),
         enableSorting: false,
         cell: ({ row }) => {
             const r = row.original;
 
-            return h('div', { class: 'flex items-center justify-end gap-1' }, [
-                // View — sky blue
-                h(ActionIcon, {
-                    icon: Eye,
-                    tooltip: 'View profile',
-                    class: 'text-sky-600 hover:bg-sky-50 hover:text-sky-700 dark:text-sky-400 dark:hover:bg-sky-950/60 dark:hover:text-sky-300',
-                    href: Managers.show.url(r.id),
-                }),
-                // Edit — amber
-                h(ActionIcon, {
-                    icon: Pencil,
-                    tooltip: 'Edit',
-                    class: 'text-amber-600 hover:bg-amber-50 hover:text-amber-700 dark:text-amber-400 dark:hover:bg-amber-950/60 dark:hover:text-amber-300',
-                    onClick: () => openEdit(r),
-                }),
-                // Delete — red
-                h(ConfirmDialog, {
-                    url: Managers.destroy.url(r.id),
-                    method: 'delete',
-                    title: 'Delete Manager?',
-                    description: `Delete ${r.name}? Their account will be soft-deleted.`,
-                    triggerLabel: 'Delete',
-                    triggerIcon: Trash2,
-                    triggerTooltip: 'Delete',
-                    triggerClass:
-                        'text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-950/60 dark:hover:text-red-300',
-                    confirmLabel: 'Delete',
-                    confirmVariant: 'destructive',
-                }),
-            ]);
+            return h(
+                'div',
+                { class: 'flex items-center justify-center gap-1' },
+                [
+                    // View — sky blue
+                    h(ActionIcon, {
+                        icon: Eye,
+                        tooltip: 'View profile',
+                        class: 'text-sky-600 hover:bg-sky-50 hover:text-sky-700 dark:text-sky-400 dark:hover:bg-sky-950/60 dark:hover:text-sky-300',
+                        href: Managers.show.url(r.id),
+                    }),
+                    // Edit — amber
+                    h(ActionIcon, {
+                        icon: Pencil,
+                        tooltip: 'Edit',
+                        class: 'text-amber-600 hover:bg-amber-50 hover:text-amber-700 dark:text-amber-400 dark:hover:bg-amber-950/60 dark:hover:text-amber-300',
+                        onClick: () => openEdit(r),
+                    }),
+                    // Delete — red
+                    h(ConfirmDialog, {
+                        url: Managers.destroy.url(r.id),
+                        method: 'delete',
+                        title: 'Delete Manager?',
+                        description: `Delete ${r.name}? if there are any linked data to this manager, the account will be soft-deleted.`,
+                        triggerLabel: 'Delete',
+                        triggerIcon: Trash2,
+                        triggerTooltip: 'Delete',
+                        triggerClass:
+                            'text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-950/60 dark:hover:text-red-300',
+                        confirmLabel: 'Delete',
+                        confirmVariant: 'destructive',
+                    }),
+                ],
+            );
         },
     },
 ];

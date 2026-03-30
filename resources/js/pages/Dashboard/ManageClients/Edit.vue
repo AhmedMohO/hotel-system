@@ -165,6 +165,7 @@
 
 <script setup>
 import { Link, useForm } from '@inertiajs/vue3';
+import { toast } from 'vue-sonner';
 
 const props = defineProps({ client: Object });
 
@@ -180,6 +181,8 @@ const form = useForm({
 function submit() {
     form.post(`/dashboard/clients/${props.client.id}`, {
         preserveScroll: true,
+        onSuccess: () => toast.success('Client updated successfully.'),
+        onError: () => toast.error('Failed to update client. Please check the form.'),
     });
 }
 </script>
