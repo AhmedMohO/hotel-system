@@ -13,6 +13,7 @@ use App\Http\Controllers\Client\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Client\Auth\RegisteredClientController;
 use App\Http\Controllers\Client\ClientDashboardController;
 use App\Http\Controllers\Client\ReservationController;
+use App\Http\Controllers\Receptionist\ClientController as ReceptionistClientController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 

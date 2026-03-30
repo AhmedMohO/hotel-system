@@ -34,6 +34,7 @@ const page = usePage<{ auth: { user: { roles: string[] } } }>();
 const roles = computed(() => page.props.auth.user?.roles ?? []);
 const isAdmin = computed(() => roles.value.includes('admin'));
 const isManager = computed(() => roles.value.includes('manager'));
+const isReceptionist = computed(() => roles.value.includes('receptionist'));
 
 const mainNavItems = computed<NavItem[]>(() => {
     const items: NavItem[] = [
@@ -70,7 +71,7 @@ const mainNavItems = computed<NavItem[]>(() => {
 
     items.push({
         title: 'Manage Clients',
-        href: '/dashboard/manage-clients',
+        href: isReceptionist.value ? '/dashboard/receptionist/clients' : '/dashboard/clients',
         icon: UserRound,
     });
 
