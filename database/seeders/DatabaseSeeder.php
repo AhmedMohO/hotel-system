@@ -20,6 +20,8 @@ class DatabaseSeeder extends Seeder
             AdminSeeder::class,
             ManagerSeeder::class,
             ReceptionistSeeder::class,
+            FloorRoomSeeder::class,
+            ClientReservationSeeder::class
         ]);
     }
 }

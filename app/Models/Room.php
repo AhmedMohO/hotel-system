@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -26,5 +27,14 @@ class Room extends Model
     public function reservations(): HasMany
     {
         return $this->hasMany(Reservation::class);
+    }
+
+    public function scopeAvailable(Builder $query, string $checkIn, string $checkOut): Builder
+    {
+        return $query->whereDoesntHave('reservations', function (Builder $reservationQuery) use ($checkIn, $checkOut) {
+            $reservationQuery
+                ->where('check_in', '<', $checkOut)
+                ->where('check_out', '>', $checkIn);
+        });
     }
 }

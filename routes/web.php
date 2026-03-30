@@ -152,10 +152,14 @@ Route::prefix('client')
                 ->name('reservations.index');
             Route::get('reservations/rooms/{room}', [ReservationController::class, 'show'])
                 ->name('reservations.show');
+            Route::post('reservations/rooms/{room}/payment-intent', [ReservationController::class, 'createPaymentIntent'])
+                ->name('reservations.payment-intent');
             Route::post('reservations/rooms/{room}', [ReservationController::class, 'store'])
                 ->name('reservations.store');
-        });
+            Route::get('my-reservations', [ReservationController::class, 'myReservations'])
+                ->name('reservations.my');
     });
+});
 
 
 Route::middleware(['auth', 'verified'])->group(function () {
