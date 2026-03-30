@@ -54,24 +54,30 @@ onUnmounted(() => {
     <Head title="Dashboard" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div
-            class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4"
-        >
+        <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
             <!-- Statistics Cards -->
             <DashboardStatistics />
 
             <!-- Row 1: 3 Pie Charts -->
-            <div class="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(280px,1fr))]">
+            <div
+                class="grid [grid-template-columns:repeat(auto-fit,minmax(280px,1fr))] gap-4"
+            >
                 <GenderDistributionChart :key="`gender-${chartRenderKey}`" />
-                <ReservationsByCountryChart :key="`country-${chartRenderKey}`" />
-                <TopReservationClientsChart :key="`clients-${chartRenderKey}`" />
+                <ReservationsByCountryChart
+                    :key="`country-${chartRenderKey}`"
+                />
+                <TopReservationClientsChart
+                    :key="`clients-${chartRenderKey}`"
+                />
             </div>
 
             <!-- Row 2: Line Chart (Full Width) -->
             <div
                 class="relative min-h-[500px] rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border"
             >
-                <ReservationsRevenueMonthlyChart :key="`revenue-${chartRenderKey}`" />
+                <ReservationsRevenueMonthlyChart
+                    :key="`revenue-${chartRenderKey}`"
+                />
             </div>
         </div>
     </AppLayout>

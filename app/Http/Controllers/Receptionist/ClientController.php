@@ -3,63 +3,88 @@
 namespace App\Http\Controllers\Receptionist;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Models\Client;
+use App\Models\Reservation;
+use App\Notifications\ClientApprovedNotification;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class ClientController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * GET /dashboard/receptionist/clients
+     * "Manage Clients" — unapproved clients only.
      */
-    public function index()
+    public function index(): Response
     {
-        //
+        $clients = Client::whereNull('approved_at')
+            ->select(['id', 'name', 'email', 'mobile', 'country', 'gender', 'avatar_image', 'created_at'])
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        return Inertia::render('Receptionist/Clients/Index', [
+            'clients' => $clients,
+        ]);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * POST /dashboard/receptionist/clients/{client}/approve
      */
-    public function create()
+    public function approve(Client $client): RedirectResponse
     {
-        //
+        abort_if($client->approved_at, 422, 'Client is already approved.');
+
+        $client->update([
+            'approved_by' => Auth::id(),
+            'approved_at' => now(),
+        ]);
+
+        $client->notify(new ClientApprovedNotification());
+
+        return back()->with('success', "{$client->name} has been approved successfully.");
     }
 
     /**
-     * Store a newly created resource in storage.
+     * GET /dashboard/receptionist/clients/my-approved
+     * "My Approved Clients" — clients approved by this receptionist.
      */
-    public function store(Request $request)
+    public function myApproved(): Response
     {
-        //
+        $clients = Client::where('approved_by', Auth::id())
+            ->whereNotNull('approved_at')
+            ->select(['id', 'name', 'email', 'mobile', 'country', 'gender', 'avatar_image', 'approved_at'])
+            ->latest('approved_at')
+            ->paginate(10)
+            ->withQueryString();
+
+        return Inertia::render('Receptionist/Clients/MyApproved', [
+            'clients' => $clients,
+        ]);
     }
 
     /**
-     * Display the specified resource.
+     * GET /dashboard/receptionist/clients/reservations
+     * "Clients Reservations" — reservations of this receptionist's approved clients.
      */
-    public function show(string $id)
+    public function reservations(): Response
     {
-        //
-    }
+        $reservations = Reservation::whereHas('client', function ($q) {
+                $q->where('approved_by', Auth::id());
+            })
+            ->with([
+                'client:id,name',
+                'room:id,number',
+            ])
+            ->select(['id', 'client_id', 'room_id', 'accompany_number', 'paid_price', 'created_at'])
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return Inertia::render('Receptionist/Clients/Reservations', [
+            'reservations' => $reservations,
+        ]);
     }
 }
