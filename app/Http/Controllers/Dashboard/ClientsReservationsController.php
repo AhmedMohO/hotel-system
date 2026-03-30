@@ -24,7 +24,7 @@ class ClientsReservationsController extends Controller
 
         $reservations = Reservation::query()
             ->where('approved_by', $request->user()->id)
-            ->with(['client:id,name', 'room:id,number'])
+            ->with(['client:id,name,avatar_image', 'room:id,number'])
             ->when($search !== '', function ($query) use ($search) {
                 $query->where(function ($inner) use ($search) {
                     $inner->where('accompany_number', 'like', "%{$search}%")
@@ -73,6 +73,7 @@ class ClientsReservationsController extends Controller
                 'id' => $reservation->id,
                 'client' => [
                     'name' => $reservation->client?->name,
+                    'avatar_image' => $reservation->client?->avatar_image,
                 ],
                 'room' => [
                     'number' => $reservation->room?->number,

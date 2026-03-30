@@ -1,11 +1,16 @@
 <script setup lang="ts">
 import type { ColumnDef } from '@tanstack/vue-table';
+import { h } from 'vue';
 import DataTable from '@/components/DataTable.vue';
+import UserAvatar from '@/components/UserAvatar.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 
 interface ReservationRow {
     id: number;
-    client: { name: string | null };
+    client: {
+        name: string | null;
+        avatar_image?: string | null;
+    };
     room: { number: string | null };
     accompany_number: number;
     check_in: string | null;
@@ -63,6 +68,20 @@ const columns: ColumnDef<ReservationRow>[] = [
         accessorFn: (row) => row.client?.name ?? '-',
         header: 'Client Name',
         enableSorting: true,
+        cell: ({ row }) => {
+            const client = row.original.client;
+
+            return h('div', { class: 'flex items-center gap-3' }, [
+                h(UserAvatar, {
+                    user: {
+                        name: client?.name ?? 'Unknown Client',
+                        avatar_image: client?.avatar_image,
+                    },
+                    class: 'h-8 w-8 rounded-full border border-border shadow-none',
+                }),
+                h('span', { class: 'font-medium' }, client?.name ?? '-'),
+            ]);
+        },
     },
     {
         accessorKey: 'accompany_number',
