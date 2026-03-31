@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Heart } from 'lucide-vue-next';
+import AppLogo from '@/components/AppLogo.vue';
 </script>
 
 <template>
@@ -9,10 +10,7 @@ import { Heart } from 'lucide-vue-next';
                 <!-- Brand -->
                 <div>
                     <div class="mb-4 flex items-center gap-2">
-                        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600">
-                            <span class="font-bold text-white">H</span>
-                        </div>
-                        <span class="text-lg font-bold text-gray-900 dark:text-white sm:text-xl">Hotel System</span>
+                        <app-logo class="w-auto h-8" />
                     </div>
                     <p class="text-xs text-gray-600 dark:text-gray-400 sm:text-sm">
                         Your trusted hotel management and reservation platform.

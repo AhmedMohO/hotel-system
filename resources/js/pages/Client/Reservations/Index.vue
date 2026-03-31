@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import InputError from '@/components/InputError.vue';
 import { Head, router, usePage } from '@inertiajs/vue3';
+import {
+    FlexRender,
+    getCoreRowModel,
+    getPaginationRowModel,
+    useVueTable,
+    type ColumnDef,
+} from '@tanstack/vue-table';
 import { computed, reactive } from 'vue';
 import ClientNavbarLayout from '@/layouts/ClientNavbarLayout.vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -53,6 +60,60 @@ const filters = reactive({
 const hasSearchInputs = computed(() => Boolean(filters.check_in && filters.check_out && filters.accompany_number));
 const errors = computed(() => page.props.errors ?? {});
 
+function reserveHref(roomId: number): string {
+    const params = new URLSearchParams({
+        check_in: filters.check_in,
+        check_out: filters.check_out,
+        accompany_number: filters.accompany_number,
+    });
+
+    return `/client/reservations/rooms/${roomId}?${params.toString()}`;
+}
+
+const columns: ColumnDef<Room>[] = [
+    {
+        accessorKey: 'number',
+        header: 'Room Number',
+        cell: ({ row }) => row.original.number,
+    },
+    {
+        id: 'floor',
+        header: 'Floor',
+        cell: ({ row }) => row.original.floor?.name ?? '-',
+    },
+    {
+        accessorKey: 'capacity',
+        header: 'Capacity',
+        cell: ({ row }) => row.original.capacity,
+    },
+    {
+        accessorKey: 'price_formatted',
+        header: 'Price / Night',
+        cell: ({ row }) => `$${row.original.price_formatted}`,
+    },
+    {
+        id: 'action',
+        header: 'Action',
+        cell: ({ row }) => row.original.id,
+    },
+];
+
+const table = useVueTable({
+    get data() {
+        return props.rooms;
+    },
+    get columns() {
+        return columns;
+    },
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    initialState: {
+        pagination: {
+            pageSize: 10,
+        },
+    },
+});
+
 function searchAvailableRooms() {
     router.get(
         '/client/reservations',
@@ -64,18 +125,11 @@ function searchAvailableRooms() {
         {
             preserveState: true,
             replace: true,
+            onSuccess: () => {
+                table.setPageIndex(0);
+            },
         },
     );
-}
-
-function reserveHref(roomId: number): string {
-    const params = new URLSearchParams({
-        check_in: filters.check_in,
-        check_out: filters.check_out,
-        accompany_number: filters.accompany_number,
-    });
-
-    return `/client/reservations/rooms/${roomId}?${params.toString()}`;
 }
 </script>
 
@@ -122,33 +176,57 @@ function reserveHref(roomId: number): string {
                 <div class="overflow-x-auto rounded-md border">
                     <Table>
                         <TableHeader>
-                            <TableRow>
-                                <TableHead>Room Number</TableHead>
-                                <TableHead>Floor</TableHead>
-                                <TableHead>Capacity</TableHead>
-                                <TableHead>Price / Night</TableHead>
-                                <TableHead class="text-right">Action</TableHead>
+                            <TableRow v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
+                                <TableHead v-for="header in headerGroup.headers" :key="header.id" :class="header.id === 'action' ? 'text-right' : ''">
+                                    <FlexRender v-if="!header.isPlaceholder" :render="header.column.columnDef.header" :props="header.getContext()" />
+                                </TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            <TableRow v-for="room in rooms" :key="room.id">
-                                <TableCell>{{ room.number }}</TableCell>
-                                <TableCell>{{ room.floor?.name ?? '-' }}</TableCell>
-                                <TableCell>{{ room.capacity }}</TableCell>
-                                <TableCell>${{ room.price_formatted }}</TableCell>
-                                <TableCell class="text-right">
-                                    <a :href="reserveHref(room.id)">
+                            <TableRow v-for="row in table.getRowModel().rows" :key="row.id">
+                                <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id" :class="cell.column.id === 'action' ? 'text-right' : ''">
+                                    <a v-if="cell.column.id === 'action'" :href="reserveHref(row.original.id)">
                                         <Button size="sm">Reserve</Button>
                                     </a>
+                                    <FlexRender v-else :render="cell.column.columnDef.cell" :props="cell.getContext()" />
                                 </TableCell>
                             </TableRow>
-                            <TableRow v-if="rooms.length === 0">
+
+                            <TableRow v-if="table.getRowModel().rows.length === 0">
                                 <TableCell colspan="5" class="h-20 text-center text-muted-foreground">
                                     {{ hasSearchInputs ? 'No rooms available for this date range.' : 'Select dates to start searching.' }}
                                 </TableCell>
                             </TableRow>
                         </TableBody>
                     </Table>
+                </div>
+
+                <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <p class="text-sm text-muted-foreground">
+                        Page {{ table.getState().pagination.pageIndex + 1 }} of {{ Math.max(table.getPageCount(), 1) }}
+                    </p>
+
+                    <div class="flex items-center gap-2">
+                        <label for="page-size" class="text-sm text-muted-foreground">Rows</label>
+                        <select
+                            id="page-size"
+                            class="h-9 rounded-md border border-input bg-background px-2 text-sm"
+                            :value="String(table.getState().pagination.pageSize)"
+                            @change="table.setPageSize(Number(($event.target as HTMLSelectElement).value))"
+                        >
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                        </select>
+
+                        <Button size="sm" variant="outline" :disabled="!table.getCanPreviousPage()" @click="table.previousPage()">
+                            Previous
+                        </Button>
+                        <Button size="sm" variant="outline" :disabled="!table.getCanNextPage()" @click="table.nextPage()">
+                            Next
+                        </Button>
+                    </div>
                 </div>
             </CardContent>
         </Card>
