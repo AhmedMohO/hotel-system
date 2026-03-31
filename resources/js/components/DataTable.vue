@@ -50,13 +50,21 @@ const props = defineProps<{
 }>();
 
 const sorting = ref<SortingState>([]);
-const globalFilter = ref(
-    props.filters?.filter?.name ?? props.filters?.search ?? '',
-);
+
+// ── Normalize initial search value from filters ───────────────────────────────
+// Supports: { filter: { name: "..." } } — the only shape we write on search,
+// so we only read from this shape to stay consistent.
+const initialFilter: string =
+    typeof props.filters?.filter === 'object' && props.filters.filter !== null
+        ? (props.filters.filter.name ?? '')
+        : '';
+
+const globalFilter = ref(initialFilter);
 const perPage = ref(props.data.per_page.toString());
 
 let searchTimer: ReturnType<typeof setTimeout>;
 
+// ── Table instance ────────────────────────────────────────────────────────────
 const table = useVueTable({
     get data() {
         return props.data.data;
@@ -93,6 +101,7 @@ const table = useVueTable({
     onPaginationChange: () => {},
 });
 
+// ── Navigation helper ─────────────────────────────────────────────────────────
 function navigateTo(extra: Record<string, any> = {}) {
     router.get(
         window.location.pathname,
@@ -105,25 +114,20 @@ function navigateTo(extra: Record<string, any> = {}) {
     );
 }
 
+// ── Search ────────────────────────────────────────────────────────────────────
 function onSearch() {
     clearTimeout(searchTimer);
     searchTimer = setTimeout(() => {
-        const filterState = { ...(props.filters?.filter || {}) };
-
-        if (globalFilter.value) {
-            filterState.name = globalFilter.value;
-        } else {
-            delete filterState.name;
-        }
-
         navigateTo({
-            filter:
-                Object.keys(filterState).length > 0 ? filterState : undefined,
+            filter: globalFilter.value
+                ? { name: globalFilter.value }
+                : undefined,
             page: 1,
         });
     }, 400);
 }
 
+// ── Pagination ────────────────────────────────────────────────────────────────
 function goToPage(page: number) {
     navigateTo({ page });
 }
@@ -237,8 +241,6 @@ function onPerPageChange(val: any) {
                     Showing {{ data.from ?? 0 }}–{{ data.to ?? 0 }} of
                     {{ data.total }} results
                 </span>
-
-                <!-- Per Page Select -->
             </div>
 
             <div class="flex items-center gap-2">

@@ -31,7 +31,7 @@ const { isCurrentUrl } = useCurrentUrl();
                     as-child
                     :is-active="isCurrentUrl(item.href)"
                     :tooltip="item.title"
-                    class="group relative h-9 w-full rounded-md px-2.5 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground data-[active=true]:bg-primary/10 data-[active=true]:text-primary"
+                    class="relative h-9 w-full rounded-md px-2.5 text-sm font-medium transition-colors hover:bg-accent hover:text-foreground data-[active=true]:bg-primary/10 data-[active=true]:text-primary"
                 >
                     <Link :href="item.href" class="flex items-center gap-2.5">
                         <!-- Left active bar -->
@@ -50,7 +50,7 @@ const { isCurrentUrl } = useCurrentUrl();
                             :class="
                                 isCurrentUrl(item.href)
                                     ? 'text-primary'
-                                    : 'text-muted-foreground group-hover:text-foreground'
+                                    : 'text-muted-foreground'
                             "
                         />
 
@@ -59,7 +59,7 @@ const { isCurrentUrl } = useCurrentUrl();
                             :class="
                                 isCurrentUrl(item.href)
                                     ? 'font-semibold text-primary'
-                                    : 'text-muted-foreground group-hover:text-foreground'
+                                    : 'text-muted-foreground'
                             "
                         >
                             {{ item.title }}

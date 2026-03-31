@@ -13,6 +13,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ClientsExport;
+use Illuminate\Support\Facades\Cache;
 
 class ClientsController extends Controller
 {
@@ -95,7 +96,18 @@ class ClientsController extends Controller
      */
     public function create(): Response
     {
-        return Inertia::render('Dashboard/ManageClients/Create');
+        $countries = Cache::remember(
+            'countries',
+            3600,
+            fn () => collect((new \Monarobase\CountryList\CountryList)->getList('en'))
+                ->map(fn ($name) => [
+                    'name' => $name,
+                ])->values()->toArray()
+        );
+
+        return Inertia::render('Dashboard/ManageClients/Create', [
+            'countries' => $countries,
+        ]);
     }
 
     /**
@@ -173,8 +185,18 @@ class ClientsController extends Controller
      */
     public function edit(Client $client): Response
     {
+        $countries = Cache::remember(
+            'countries',
+            3600,
+            fn () => collect((new \Monarobase\CountryList\CountryList)->getList('en'))
+                ->map(fn ($name) => [
+                    'name' => $name,
+                ])->values()->toArray()
+        );
+
         return Inertia::render('Dashboard/ManageClients/Edit', [
             'client' => $client,
+            'countries' => $countries,
         ]);
     }
 
