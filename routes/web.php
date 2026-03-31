@@ -12,6 +12,7 @@ use App\Http\Controllers\Client\Auth\NewPasswordController;
 use App\Http\Controllers\Client\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Client\Auth\RegisteredClientController;
 use App\Http\Controllers\Client\ClientDashboardController;
+use App\Http\Controllers\Client\ProfileController;
 use App\Http\Controllers\Client\ReservationController;
 use App\Http\Controllers\Receptionist\ClientController as ReceptionistClientController;
 use App\Http\Controllers\Dashboard\ClientsReservationsController;
@@ -148,6 +149,10 @@ Route::prefix('client')
             // Client pages
             Route::get('dashboard', [ClientDashboardController::class, 'index'])
                 ->name('dashboard');
+            Route::get('profile', [ProfileController::class, 'edit'])
+                ->name('profile.edit');
+            Route::patch('profile', [ProfileController::class, 'update'])
+                ->name('profile.update');
             Route::get('reservations', [ReservationController::class, 'index'])
                 ->name('reservations.index');
             Route::get('reservations/rooms/{room}', [ReservationController::class, 'show'])

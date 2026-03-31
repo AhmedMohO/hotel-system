@@ -197,7 +197,7 @@ class ReservationController extends Controller
             ]);
         }
 
-        return redirect()->route('reservations.my')->with('success', 'Reservation created successfully.');
+        return redirect()->route('client.reservations.my')->with('success', 'Reservation created successfully.');
     }
 
     public function myReservations(Request $request): Response|JsonResponse
@@ -205,7 +205,7 @@ class ReservationController extends Controller
         $client = $request->user('client');
 
         $reservations = Reservation::query()
-            ->with('room:id,number')
+            ->with(['room:id,number', 'approver:id,name'])
             ->where('client_id', $client->id)
             ->orderByDesc('check_in')
             ->get();

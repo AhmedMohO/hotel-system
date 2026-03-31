@@ -23,10 +23,13 @@ type ReservationRow = {
         id: number | null;
         number: string | null;
     };
-    check_in: string;
-    check_out: string;
+    check_in: string | null;
+    check_out: string | null;
     paid_price: number;
     paid_price_formatted: string;
+    approved_by: number | null;
+    is_approved: boolean;
+    approved_by_name: string | null;
 };
 
 const props = defineProps<{
@@ -43,15 +46,22 @@ const columns: ColumnDef<ReservationRow>[] = [
     {
         accessorKey: 'check_in',
         header: 'Check-in',
+        cell: ({ row }) => row.original.check_in ?? '-',
     },
     {
         accessorKey: 'check_out',
         header: 'Check-out',
+        cell: ({ row }) => row.original.check_out ?? '-',
     },
     {
         accessorKey: 'paid_price_formatted',
         header: 'Paid Price',
         cell: ({ row }) => `$${row.original.paid_price_formatted}`,
+    },
+    {
+        id: 'status',
+        header: 'Status',
+        cell: ({ row }) => (row.original.approved_by ? 'Approved' : 'Pending'),
     },
 ];
 
@@ -69,7 +79,9 @@ const table = useVueTable({
 <template>
     <Head title="My Reservations" />
 
-    <div class="mx-auto w-full max-w-5xl space-y-6 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+    <div
+        class="mx-auto w-full max-w-5xl space-y-6 px-4 py-6 sm:px-6 lg:px-8 lg:py-8"
+    >
         <Card>
             <CardHeader>
                 <CardTitle>My Reservations</CardTitle>
@@ -78,21 +90,44 @@ const table = useVueTable({
                 <div class="overflow-x-auto rounded-md border">
                     <Table>
                         <TableHeader>
-                            <TableRow v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
-                                <TableHead v-for="header in headerGroup.headers" :key="header.id">
-                                    <FlexRender :render="header.column.columnDef.header" :props="header.getContext()" />
+                            <TableRow
+                                v-for="headerGroup in table.getHeaderGroups()"
+                                :key="headerGroup.id"
+                            >
+                                <TableHead
+                                    v-for="header in headerGroup.headers"
+                                    :key="header.id"
+                                >
+                                    <FlexRender
+                                        :render="header.column.columnDef.header"
+                                        :props="header.getContext()"
+                                    />
                                 </TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            <TableRow v-for="row in table.getRowModel().rows" :key="row.id">
-                                <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id">
-                                    <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
+                            <TableRow
+                                v-for="row in table.getRowModel().rows"
+                                :key="row.id"
+                            >
+                                <TableCell
+                                    v-for="cell in row.getVisibleCells()"
+                                    :key="cell.id"
+                                >
+                                    <FlexRender
+                                        :render="cell.column.columnDef.cell"
+                                        :props="cell.getContext()"
+                                    />
                                 </TableCell>
                             </TableRow>
 
-                            <TableRow v-if="table.getRowModel().rows.length === 0">
-                                <TableCell :colspan="columns.length" class="h-20 text-center text-muted-foreground">
+                            <TableRow
+                                v-if="table.getRowModel().rows.length === 0"
+                            >
+                                <TableCell
+                                    :colspan="columns.length"
+                                    class="h-20 text-center text-muted-foreground"
+                                >
                                     You do not have any reservations yet.
                                 </TableCell>
                             </TableRow>
@@ -103,4 +138,3 @@ const table = useVueTable({
         </Card>
     </div>
 </template>
-

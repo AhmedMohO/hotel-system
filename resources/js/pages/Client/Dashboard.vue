@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Head } from '@inertiajs/vue3';
 import ClientNavbarLayout from '@/layouts/ClientNavbarLayout.vue';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -96,12 +96,12 @@ defineOptions({
                     <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
                         Update your personal information and account settings.
                     </p>
-<!--                    <Link :href="route('profile.edit')">-->
-<!--                        <Button variant="outline" class="w-full gap-2">-->
-<!--                            <Home class="w-4 h-4" />-->
-<!--                            Edit Profile-->
-<!--                        </Button>-->
-<!--                    </Link>-->
+                    <a href="/client/profile">
+                        <Button variant="outline" class="w-full gap-2">
+                            <Home class="w-4 h-4" />
+                            Edit Profile
+                        </Button>
+                    </a>
                 </CardContent>
             </Card>
         </div>

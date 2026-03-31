@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { Head, Link, usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
+import { usePage } from '@inertiajs/vue3';
 import { Toaster } from 'vue-sonner';
 import AppContent from '@/components/AppContent.vue';
-import AppHeader from '@/components/AppHeader.vue';
 import AppShell from '@/components/AppShell.vue';
 import ClientFooter from '@/components/ClientFooter.vue';
 import { Button } from '@/components/ui/button';
@@ -17,6 +17,26 @@ import { LogOut, User, Home } from 'lucide-vue-next';
 import AppLogo from '@/components/AppLogo.vue';
 
 const page = usePage();
+
+const avatarUrl = computed(() => {
+    const avatar = (page.props.auth as any)?.user?.avatar_image as string | null | undefined;
+
+    if (!avatar) {
+        return null;
+    }
+
+    if (avatar.startsWith('http') || avatar.startsWith('/') || avatar.startsWith('data:')) {
+        return avatar;
+    }
+
+    if (avatar.startsWith('storage/')) {
+        return `/${avatar}`;
+    }
+
+    return `/storage/${avatar}`;
+});
+
+const userInitial = computed(() => String((page.props.auth as any)?.user?.name ?? 'U').charAt(0).toUpperCase());
 </script>
 
 <template>
@@ -35,6 +55,9 @@ const page = usePage();
                         <a href="/client/my-reservations" class="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium transition-colors">
                             My Reservations
                         </a>
+<!--                        <a href="/client/profile" class="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium transition-colors">-->
+<!--                            Profile-->
+<!--                        </a>-->
                     </nav>
 
                     <!-- User Menu -->
@@ -42,8 +65,9 @@ const page = usePage();
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="ghost" size="icon" class="relative">
-                                    <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium">
-                                        {{ page.props.auth.user.name.charAt(0).toUpperCase() }}
+                                    <div class="w-8 h-8 rounded-full overflow-hidden bg-blue-600 flex items-center justify-center text-white font-medium">
+                                        <img v-if="avatarUrl" :src="avatarUrl" alt="Profile avatar" class="h-full w-full object-cover" />
+                                        <span v-else>{{ userInitial }}</span>
                                     </div>
                                 </Button>
                             </DropdownMenuTrigger>
@@ -61,6 +85,12 @@ const page = usePage();
                                     <a href="/client/dashboard" class="cursor-pointer flex items-center gap-2">
                                         <Home class="w-4 h-4" />
                                         Dashboard
+                                    </a>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem as-child>
+                                    <a href="/client/profile" class="cursor-pointer flex items-center gap-2">
+                                        <User class="w-4 h-4" />
+                                        Edit Profile
                                     </a>
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />

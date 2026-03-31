@@ -5,7 +5,7 @@ import { Heart } from 'lucide-vue-next';
 <template>
     <footer class="bg-gray-50 dark:bg-gray-950 border-t border-gray-200 dark:border-gray-800 mt-16">
         <div class="mx-auto w-full max-w-7xl space-y-8 px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
-            <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-2">
                 <!-- Brand -->
                 <div>
                     <div class="mb-4 flex items-center gap-2">
@@ -41,49 +41,6 @@ import { Heart } from 'lucide-vue-next';
                     </ul>
                 </div>
 
-                <!-- Support -->
-                <div>
-                    <h4 class="mb-4 font-semibold text-gray-900 dark:text-white">Support</h4>
-                    <ul class="space-y-2">
-                        <li>
-                            <a href="mailto:support@hotel.local" class="text-xs text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white sm:text-sm">
-                                Contact Us
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="text-xs text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white sm:text-sm">
-                                FAQ
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="text-xs text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white sm:text-sm">
-                                Terms of Service
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Legal -->
-                <div>
-                    <h4 class="mb-4 font-semibold text-gray-900 dark:text-white">Legal</h4>
-                    <ul class="space-y-2">
-                        <li>
-                            <a href="#" class="text-xs text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white sm:text-sm">
-                                Privacy Policy
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="text-xs text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white sm:text-sm">
-                                Cookie Policy
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="text-xs text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white sm:text-sm">
-                                Disclaimer
-                            </a>
-                        </li>
-                    </ul>
-                </div>
             </div>
 
             <!-- Divider -->

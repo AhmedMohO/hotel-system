@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { Head, router } from '@inertiajs/vue3';
+import InputError from '@/components/InputError.vue';
+import { Head, router, usePage } from '@inertiajs/vue3';
 import { computed, reactive } from 'vue';
 import ClientNavbarLayout from '@/layouts/ClientNavbarLayout.vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -41,6 +42,8 @@ const props = defineProps<{
     };
 }>();
 
+const page = usePage<{ errors: Record<string, string> }>();
+
 const filters = reactive({
     check_in: props.filters.check_in ?? '',
     check_out: props.filters.check_out ?? '',
@@ -48,6 +51,7 @@ const filters = reactive({
 });
 
 const hasSearchInputs = computed(() => Boolean(filters.check_in && filters.check_out && filters.accompany_number));
+const errors = computed(() => page.props.errors ?? {});
 
 function searchAvailableRooms() {
     router.get(
@@ -88,16 +92,19 @@ function reserveHref(roomId: number): string {
                     <div class="space-y-2">
                         <Label for="check-in" class="text-sm">Check-in</Label>
                         <Input id="check-in" v-model="filters.check_in" type="date" required />
+                        <InputError :message="errors.check_in" />
                     </div>
 
                     <div class="space-y-2">
                         <Label for="check-out" class="text-sm">Check-out</Label>
                         <Input id="check-out" v-model="filters.check_out" type="date" required />
+                        <InputError :message="errors.check_out" />
                     </div>
 
                     <div class="space-y-2">
                         <Label for="accompany" class="text-sm">Accompany Number</Label>
                         <Input id="accompany" v-model="filters.accompany_number" type="number" min="1" required />
+                        <InputError :message="errors.accompany_number" />
                     </div>
 
                     <div class="flex items-end sm:col-span-2 lg:col-span-1">

@@ -8,28 +8,39 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Reservation extends Model
 {
-   use HasFactory;
+    use HasFactory;
 
     protected $fillable = [
         'client_id',
         'room_id',
-        'checkin_date',
-        'checkout_date',
+        'check_in',
+        'check_out',
         'accompany_number',
-        'total_price',
         'paid_price',
-        'payment_method',
-        'status',
+        'approved_by',
     ];
 
-    public function client()
+    protected $casts = [
+        'check_in' => 'date',
+        'check_out' => 'date',
+        'accompany_number' => 'integer',
+        'paid_price' => 'integer',
+        'approved_by' => 'integer',
+    ];
+
+    public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class);
     }
 
-    public function room()
+    public function room(): BelongsTo
     {
         return $this->belongsTo(Room::class);
+    }
+
+    public function approver(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approved_by');
     }
 }
 

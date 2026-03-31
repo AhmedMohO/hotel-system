@@ -18,19 +18,28 @@ const emit = defineEmits<{
 const preview = ref<string | null>(null);
 const inputRef = ref<HTMLInputElement | null>(null);
 
+function resolveAvatarUrl(value?: string | null): string {
+    if (!value) {
+        return '/images/avatar.jpg';
+    }
+
+    if (value.startsWith('http') || value.startsWith('/') || value.startsWith('data:')) {
+        return value;
+    }
+
+    if (value.startsWith('storage/')) {
+        return `/${value}`;
+    }
+
+    return `/storage/${value}`;
+}
+
 // Set initial preview from current avatar
 watch(
     () => props.currentAvatar,
     (val) => {
         if (!props.removed) {
-            if (val) {
-                preview.value =
-                    val.startsWith('http') || val.startsWith('/')
-                        ? val
-                        : `/storage/${val}`;
-            } else {
-                preview.value = '/images/avatar.jpg';
-            }
+            preview.value = resolveAvatarUrl(val);
         }
     },
     { immediate: true },
