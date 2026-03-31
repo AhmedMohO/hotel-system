@@ -14,6 +14,7 @@ use App\Http\Controllers\Client\Auth\RegisteredClientController;
 use App\Http\Controllers\Client\ClientDashboardController;
 use App\Http\Controllers\Client\ReservationController;
 use App\Http\Controllers\Receptionist\ClientController as ReceptionistClientController;
+use App\Http\Controllers\Dashboard\ClientsReservationsController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -29,6 +30,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::middleware('role:admin')->group(function () {
             Route::resource('managers', ManagerController::class)
                 ->only(['index', 'store', 'update', 'destroy', 'show']);
+        });
+
+        Route::middleware('role:receptionist')->group(function () {
+            Route::get('clients-reservations', [ClientsReservationsController::class, 'index'])
+                ->name('dashboard.clients-reservations');
         });
 
         Route::middleware('role:admin|manager')->group(function () {

@@ -8,6 +8,7 @@ import {
     ShieldCheck,
     Building2,
     BedDouble,
+    ClipboardList,
 } from 'lucide-vue-next';
 import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
@@ -72,6 +73,14 @@ const mainNavItems = computed<NavItem[]>(() => {
             title: 'Manage Rooms',
             href: Rooms.index.url(),
             icon: BedDouble,
+        });
+    }
+
+    if (isReceptionist.value) {
+        items.push({
+            title: 'Clients Reservations',
+            href: '/dashboard/clients-reservations',
+            icon: ClipboardList,
         });
     }
 
