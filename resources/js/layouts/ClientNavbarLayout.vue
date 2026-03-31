@@ -14,6 +14,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { LogOut, User, Home } from 'lucide-vue-next';
+import AppLogo from '@/components/AppLogo.vue';
 
 const page = usePage();
 </script>
@@ -24,12 +25,7 @@ const page = usePage();
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center h-16">
                     <!-- Logo/Home -->
-                    <a href="/client/dashboard" class="flex items-center gap-2">
-                        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-600">
-                            <Home class="w-6 h-6 text-white" />
-                        </div>
-                        <span class="text-xl font-bold text-gray-900 dark:text-white">Hotel</span>
-                    </a>
+                   <app-logo class="w-auto h-8" />
 
                     <!-- Navigation Links -->
                     <nav class="hidden md:flex items-center gap-8">
