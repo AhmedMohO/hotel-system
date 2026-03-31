@@ -28,6 +28,7 @@ type ReservationRow = {
     paid_price: number;
     paid_price_formatted: string;
     approved_by: number | null;
+    status?: string | null;
     is_approved: boolean;
     approved_by_name: string | null;
 };
@@ -61,7 +62,13 @@ const columns: ColumnDef<ReservationRow>[] = [
     {
         id: 'status',
         header: 'Status',
-        cell: ({ row }) => (row.original.approved_by ? 'Approved' : 'Pending'),
+        cell: ({ row }) => {
+            if (row.original.status) {
+                return row.original.status.charAt(0).toUpperCase() + row.original.status.slice(1);
+            }
+
+            return row.original.approved_by ? 'Approved' : 'Pending';
+        },
     },
 ];
 

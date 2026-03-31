@@ -21,6 +21,7 @@ class ReservationFactory extends Factory
             'accompany_number' => $this->faker->numberBetween(0, 3),
             'paid_price' => $this->faker->numberBetween(100, 1500) * 100,
             'approved_by' => User::inRandomOrder()->value('id') ?? User::factory(),
+            'status' => Reservation::STATUS_APPROVED,
         ];
     }
 }

@@ -20,7 +20,8 @@ class MyReservationResource extends JsonResource
             'paid_price' => (int) $this->paid_price,
             'paid_price_formatted' => number_format(((int) $this->paid_price) / 100, 2),
             'approved_by' => $this->approved_by,
-            'is_approved' => ! is_null($this->approved_by),
+            'status' => $this->status,
+            'is_approved' => $this->status === 'approved' || ! is_null($this->approved_by),
             'approved_by_name' => $this->approver?->name,
             'room' => [
                 'id' => $this->room?->id,

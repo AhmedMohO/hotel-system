@@ -187,6 +187,7 @@ class ReservationController extends Controller
                     'accompany_number' => (int) $payload['accompany_number'],
                     'paid_price' => $paidPrice,
                     'approved_by' => null,
+                    'status' => Reservation::STATUS_PENDING,
                 ]);
 
                 $this->stripePaymentService->markPaymentIntentAsUsed($payload['payment_intent_id']);

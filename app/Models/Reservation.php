@@ -10,6 +10,9 @@ class Reservation extends Model
 {
     use HasFactory;
 
+    public const STATUS_PENDING = 'pending';
+    public const STATUS_APPROVED = 'approved';
+
     protected $fillable = [
         'client_id',
         'room_id',
@@ -18,6 +21,7 @@ class Reservation extends Model
         'accompany_number',
         'paid_price',
         'approved_by',
+        'status',
     ];
 
     protected $casts = [
@@ -26,6 +30,7 @@ class Reservation extends Model
         'accompany_number' => 'integer',
         'paid_price' => 'integer',
         'approved_by' => 'integer',
+        'status' => 'string',
     ];
 
     public function client(): BelongsTo

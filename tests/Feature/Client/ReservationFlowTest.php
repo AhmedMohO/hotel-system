@@ -4,7 +4,6 @@ use App\Models\Client;
 use App\Models\Reservation;
 use App\Models\Room;
 use App\Services\StripeReservationPaymentService;
-use Mockery;
 use Stripe\PaymentIntent;
 
 it('creates a reservation after a successful payment verification', function () {
@@ -43,6 +42,7 @@ it('creates a reservation after a successful payment verification', function () 
         'accompany_number' => 2,
         'paid_price' => 30000,
         'approved_by' => null,
+        'status' => Reservation::STATUS_PENDING,
     ]);
 });
 
@@ -60,6 +60,7 @@ it('rejects overlapping reservations for the same room', function () {
         'accompany_number' => 1,
         'paid_price' => 20000,
         'approved_by' => null,
+        'status' => Reservation::STATUS_PENDING,
     ]);
 
     $mock = Mockery::mock(StripeReservationPaymentService::class);
@@ -91,6 +92,7 @@ it('returns authenticated client reservations as json with room info', function 
         'accompany_number' => 1,
         'paid_price' => 25000,
         'approved_by' => null,
+        'status' => Reservation::STATUS_PENDING,
     ]);
 
     $response = $this->actingAs($client, 'client')

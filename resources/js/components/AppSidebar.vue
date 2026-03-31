@@ -90,6 +90,11 @@ const mainNavItems = computed<NavItem[]>(() => {
             href: '/dashboard/clients-reservations',
             icon: ClipboardList,
         },
+        {
+            title: 'Pending Reservations',
+            href: '/dashboard/clients-reservations/pending',
+            icon: ClipboardList,
+        },
     );
 
     return items;

@@ -33,10 +33,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 ->only(['index', 'store', 'update', 'destroy', 'show']);
         });
 
-        Route::middleware('role:receptionist|admin|manager')->group(function () {
-            Route::resource('clients-reservations', ClientsReservationsController::class)
-                ->only(['index']);
-        });
+        Route::middleware('role:receptionist|admin|manager')
+            ->prefix('clients-reservations')
+            ->name('clients-reservations.')
+            ->controller(ClientsReservationsController::class)
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::get('/pending', 'pending')->name('pending');
+                Route::patch('/{reservation}/approve', 'approve')->name('approve');
+            });
 
         Route::middleware('role:admin|manager')->group(function () {
             Route::resource('receptionists', ReceptionistController::class)
