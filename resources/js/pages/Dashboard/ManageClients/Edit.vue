@@ -1,5 +1,5 @@
 <template>
-    <div class="min-h-screen bg-slate-50">
+    <AppLayout>
         <div class="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
             <div class="mb-8 flex items-center gap-4">
                 <Link
@@ -20,18 +20,18 @@
                         />
                     </svg>
                 </Link>
-                <h1 class="text-2xl font-bold tracking-tight text-slate-900">
+                <h1 class="text-2xl font-bold tracking-tight text-foreground">
                     Edit Client Profile
                 </h1>
             </div>
 
             <form
                 @submit.prevent="submit"
-                class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+                class="overflow-hidden rounded-2xl border border-slate-200 bg-card shadow-sm"
             >
                 <div class="px-8 pt-14 pb-8">
                     <div class="mb-8">
-                        <h2 class="text-lg font-bold text-slate-900">
+                        <h2 class="text-lg font-bold text-foreground">
                             Personal Information
                         </h2>
                         <p class="text-sm text-slate-500">
@@ -108,15 +108,9 @@
                                 class="mb-1.5 block text-xs font-medium tracking-wider text-slate-400 uppercase"
                                 >Country</label
                             >
-                            <input
+                            <CountrySelect
                                 v-model="form.country"
-                                type="text"
-                                class="w-full rounded-xl border bg-slate-50 px-4 py-2.5 text-sm font-semibold text-slate-800 transition focus:border-slate-400 focus:bg-white focus:ring-4 focus:ring-slate-100 focus:outline-none"
-                                :class="
-                                    form.errors.country
-                                        ? 'border-red-400 ring-red-50'
-                                        : 'border-slate-100'
-                                "
+                                :countries="countries"
                             />
                         </div>
 
@@ -152,7 +146,7 @@
                         <button
                             type="submit"
                             :disabled="form.processing"
-                            class="rounded-xl bg-slate-900 px-8 py-2.5 text-sm font-semibold text-white transition-all hover:bg-slate-800 hover:shadow-lg active:scale-95 disabled:bg-slate-400"
+                            class="rounded-xl bg-primary px-8 py-2.5 text-sm font-semibold text-white transition-all hover:bg-primary/80 hover:shadow-lg active:scale-95 disabled:bg-slate-400"
                         >
                             {{ form.processing ? 'Saving...' : 'Save Changes' }}
                         </button>
@@ -160,14 +154,16 @@
                 </div>
             </form>
         </div>
-    </div>
+    </AppLayout>
 </template>
 
 <script setup>
 import { Link, useForm } from '@inertiajs/vue3';
 import { toast } from 'vue-sonner';
+import CountrySelect from '@/components/CountrySelect.vue';
+import AppLayout from '@/layouts/AppLayout.vue';
 
-const props = defineProps({ client: Object });
+const props = defineProps({ client: Object, countries: Array });
 
 const form = useForm({
     name: props.client.name,
@@ -182,7 +178,8 @@ function submit() {
     form.post(`/dashboard/clients/${props.client.id}`, {
         preserveScroll: true,
         onSuccess: () => toast.success('Client updated successfully.'),
-        onError: () => toast.error('Failed to update client. Please check the form.'),
+        onError: () =>
+            toast.error('Failed to update client. Please check the form.'),
     });
 }
 </script>

@@ -132,9 +132,9 @@ const footerNavItems: NavItem[] = [
         </SidebarContent>
 
         <!-- Footer: Profile + User -->
-        <SidebarFooter class="space-y-1 border-t border-border/60 px-2 py-3">
+        <SidebarFooter class="border-t border-border/60">
             <NavFooter :items="footerNavItems" />
-            <SidebarSeparator class="my-1 opacity-50" />
+            <SidebarSeparator class="opacity-50" />
             <NavUser />
         </SidebarFooter>
     </Sidebar>
