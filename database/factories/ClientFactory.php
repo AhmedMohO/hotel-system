@@ -17,18 +17,18 @@ class ClientFactory extends Factory
 
     public function definition(): array
     {
-        $gender = fake()->randomElement(['Male', 'Female']);
+        $gender = $this->faker->randomElement(['Male', 'Female']);
         return [
-            'name' => fake()->name($gender === 'Male' ? 'male' : 'female'),
-            'email' => fake()->unique()->safeEmail(),
+            'name' => $this->faker->name($gender === 'Male' ? 'male' : 'female'),
+            'email' => $this->faker->unique()->safeEmail(),
             'password' => static::$password ??= Hash::make('password'),
             'avatar_image' => null,
-            'mobile' => fake()->phoneNumber(),
-            'country' => fake()->country(),
+            'mobile' => $this->faker->phoneNumber(),
+            'country' => $this->faker->country(),
             'gender' => $gender,
             'approved_by' => User::inRandomOrder()->value('id') ?? null,
             'approved_at' => now(),
-            'last_login_at' => fake()->optional()->dateTimeThisYear(),
+            'last_login_at' => $this->faker->optional()->dateTimeThisYear(),
             'remember_token' => Str::random(10),
         ];
     }

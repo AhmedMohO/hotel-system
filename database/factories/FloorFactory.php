@@ -14,8 +14,8 @@ class FloorFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->word() . ' Floor',
-            'number' => fake()->unique()->numerify('F-###'),
+            'name' => $this->faker->word() . ' Floor',
+            'number' => $this->faker->unique()->numerify('F-###'),
             'created_by' => User::inRandomOrder()->first()->id ?? User::factory(),
         ];
     }

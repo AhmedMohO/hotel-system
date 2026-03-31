@@ -7,13 +7,14 @@ use App\Models\Floor;
 use App\Models\Reservation;
 use App\Models\Room;
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class ClientReservationSeeder extends Seeder
 {
     public function run(): void
     {
+        $faker = \Faker\Factory::create();
+
         // Require at least one user to assign as 'created_by' / 'approved_by'
         if (User::count() === 0) {
             User::factory()->create();
@@ -29,9 +30,9 @@ class ClientReservationSeeder extends Seeder
         $clients = Client::factory()->count(50)->create();
 
         // Create 1-3 Reservations per Client
-        $clients->each(function (Client $client) {
+        $clients->each(function (Client $client) use ($faker) {
             Reservation::factory()
-                ->count(fake()->numberBetween(1, 3))
+                ->count($faker->numberBetween(1, 3))
                 ->create([
                     'client_id' => $client->id,
                 ]);
