@@ -57,7 +57,7 @@ function handleSelect(val: string) {
             </PopoverTrigger>
 
             <PopoverContent class="w-[var(--radix-popover-trigger-width)] p-0">
-                <Command>
+                <Command class="w-42">
                     <CommandInput class="h-9" placeholder="Search country..." />
                     <CommandEmpty>No country found.</CommandEmpty>
                     <CommandList>

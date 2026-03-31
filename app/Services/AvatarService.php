@@ -18,6 +18,7 @@ class AvatarService
             $required ? 'required' : 'nullable',
             'image',
             'mimes:jpg,jpeg',
+            'extensions:jpg,jpeg',
             'max:2048',
         ];
     }
