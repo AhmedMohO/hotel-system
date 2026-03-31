@@ -32,9 +32,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 ->only(['index', 'store', 'update', 'destroy', 'show']);
         });
 
-        Route::middleware('role:receptionist')->group(function () {
-            Route::get('clients-reservations', [ClientsReservationsController::class, 'index'])
-                ->name('dashboard.clients-reservations');
+        Route::middleware('role:receptionist|admin|manager')->group(function () {
+            Route::resource('clients-reservations', ClientsReservationsController::class)
+                ->only(['index']);
         });
 
         Route::middleware('role:admin|manager')->group(function () {
@@ -47,7 +47,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         });
 
 
-        // Floors & Rooms — Dev 2
         Route::middleware(['auth', 'role:admin|manager'])->group(function () {
             Route::resource('floors', \App\Http\Controllers\Dashboard\FloorController::class)
                 ->except(['show']);

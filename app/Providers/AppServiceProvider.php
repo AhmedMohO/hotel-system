@@ -32,7 +32,7 @@ class AppServiceProvider extends ServiceProvider
 
                     return $request->wantsJson()
                         ? response()->json(['two_factor' => false])
-                        : redirect()->intended($url);
+                        : redirect($url);
                 }
             };
         });

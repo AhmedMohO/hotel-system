@@ -23,6 +23,7 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarSeparator,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import * as Floors from '@/routes/floors';
@@ -76,21 +77,20 @@ const mainNavItems = computed<NavItem[]>(() => {
         });
     }
 
-    if (isReceptionist.value) {
-        items.push({
+    items.push(
+        {
+            title: 'Manage Clients',
+            href: isReceptionist.value
+                ? '/dashboard/receptionist/clients'
+                : '/dashboard/clients',
+            icon: UserRound,
+        },
+        {
             title: 'Clients Reservations',
             href: '/dashboard/clients-reservations',
             icon: ClipboardList,
-        });
-    }
-
-    items.push({
-        title: 'Manage Clients',
-        href: isReceptionist.value
-            ? '/dashboard/receptionist/clients'
-            : '/dashboard/clients',
-        icon: UserRound,
-    });
+        },
+    );
 
     return items;
 });
@@ -102,16 +102,22 @@ const footerNavItems: NavItem[] = [
 
 <template>
     <Sidebar collapsible="icon" variant="inset">
-        <SidebarHeader>
+        <!-- Header: Logo -->
+        <SidebarHeader class="border-b border-border/60 px-3 py-3">
             <SidebarMenu>
                 <SidebarMenuItem>
-                    <SidebarMenuButton size="lg" as-child>
+                    <SidebarMenuButton
+                        size="lg"
+                        as-child
+                        class="rounded-md hover:bg-accent"
+                    >
                         <Link
                             :href="
                                 isReceptionist
                                     ? '/dashboard/receptionist/clients'
                                     : dashboard()
                             "
+                            class="flex items-center gap-2.5"
                         >
                             <AppLogo />
                         </Link>
@@ -120,14 +126,18 @@ const footerNavItems: NavItem[] = [
             </SidebarMenu>
         </SidebarHeader>
 
-        <SidebarContent>
+        <!-- Main Navigation -->
+        <SidebarContent class="overflow-x-hidden">
             <NavMain :items="mainNavItems" />
         </SidebarContent>
 
-        <SidebarFooter>
+        <!-- Footer: Profile + User -->
+        <SidebarFooter class="space-y-1 border-t border-border/60 px-2 py-3">
             <NavFooter :items="footerNavItems" />
+            <SidebarSeparator class="my-1 opacity-50" />
             <NavUser />
         </SidebarFooter>
     </Sidebar>
+
     <slot />
 </template>

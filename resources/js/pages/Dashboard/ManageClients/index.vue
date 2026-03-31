@@ -6,6 +6,7 @@ import { computed, h } from 'vue';
 import { toast } from 'vue-sonner';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import DataTable from '@/components/DataTable.vue';
+import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 
@@ -258,7 +259,7 @@ const columns: ColumnDef<Client, any>[] = [
                         </p>
                     </div>
 
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2 max-sm:flex-wrap">
                         <!-- My Approved Clients — all roles -->
                         <Link
                             href="/dashboard/clients/my-approved"
@@ -281,12 +282,13 @@ const columns: ColumnDef<Client, any>[] = [
                         </Link>
 
                         <template v-if="isAdminOrManager">
-                            <button
+                            <Button
                                 @click="exportExcel"
-                                class="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-muted"
+                                variant="outline"
+                                class="bg-green-500/10"
                             >
                                 <svg
-                                    class="h-4 w-4 text-primary"
+                                    class="h-4 w-4 text-green-500"
                                     viewBox="0 0 24 24"
                                     fill="none"
                                     stroke="currentColor"
@@ -308,7 +310,7 @@ const columns: ColumnDef<Client, any>[] = [
                                     <line x1="15" y1="3" x2="15" y2="21" />
                                 </svg>
                                 Export Excel
-                            </button>
+                            </Button>
                         </template>
 
                         <Link
