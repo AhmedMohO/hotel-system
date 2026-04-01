@@ -18,9 +18,10 @@ class ReservationFactory extends Factory
         return [
             'client_id' => Client::inRandomOrder()->value('id') ?? Client::factory(),
             'room_id' => Room::inRandomOrder()->value('id') ?? Room::factory(),
-            'accompany_number' => fake()->numberBetween(0, 3),
-            'paid_price' => fake()->numberBetween(100, 1500) * 100,
+            'accompany_number' => $this->faker->numberBetween(0, 3),
+            'paid_price' => $this->faker->numberBetween(100, 1500) * 100,
             'approved_by' => User::inRandomOrder()->value('id') ?? User::factory(),
+            'status' => Reservation::STATUS_APPROVED,
         ];
     }
 }

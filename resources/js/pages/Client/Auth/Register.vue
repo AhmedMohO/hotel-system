@@ -2,19 +2,14 @@
 import { Form, Head } from '@inertiajs/vue3';
 import { toast } from 'vue-sonner';
 import AvatarUpload from '@/components/AvatarUpload.vue';
+import CountrySelect from '@/components/CountrySelect.vue';
 import InputError from '@/components/InputError.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
 import TextLink from '@/components/TextLink.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
 import AuthLayout from '@/layouts/auth/AuthSplitLayout.vue';
 import { login } from '@/routes/client';
@@ -96,23 +91,13 @@ defineProps<{
                 <div class="flex gap-4">
                     <div class="grid w-full gap-2">
                         <Label>Country</Label>
-                        <Select name="country" required>
-                            <SelectTrigger class="w-full" tabindex="4">
-                                <SelectValue
-                                    class=""
-                                    placeholder="Select country"
-                                />
-                            </SelectTrigger>
-                            <SelectContent class="max-w-[220px]!">
-                                <SelectItem
-                                    v-for="country in countries"
-                                    :key="country.name"
-                                    :value="country.name"
-                                >
-                                    {{ country.name }}
-                                </SelectItem>
-                            </SelectContent>
-                        </Select>
+                        <CountrySelect
+                            name="country"
+                            :countries="countries"
+                            placeholder="Select country"
+                            :required="true"
+                            tabindex="4"
+                        />
                         <InputError :message="errors.country" />
                     </div>
 

@@ -12,8 +12,12 @@ use App\Http\Controllers\Client\Auth\NewPasswordController;
 use App\Http\Controllers\Client\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Client\Auth\RegisteredClientController;
 use App\Http\Controllers\Client\ClientDashboardController;
+use App\Http\Controllers\Client\ProfileController;
 use App\Http\Controllers\Client\ReservationController;
+use App\Http\Controllers\Receptionist\ClientController as ReceptionistClientController;
+use App\Http\Controllers\Dashboard\ClientsReservationsController;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 use Laravel\Fortify\Features;
 
 Route::inertia('/', 'Welcome', [
@@ -21,13 +25,23 @@ Route::inertia('/', 'Welcome', [
 ])->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'Dashboard/index')->name('dashboard');
+    Route::middleware(['role:admin|manager'])->get('dashboard', fn () => Inertia::render('Dashboard/index'))->name('dashboard');
 
     Route::prefix('dashboard')->group(function () {
         Route::middleware('role:admin')->group(function () {
             Route::resource('managers', ManagerController::class)
                 ->only(['index', 'store', 'update', 'destroy', 'show']);
         });
+
+        Route::middleware('role:receptionist|admin|manager')
+            ->prefix('clients-reservations')
+            ->name('clients-reservations.')
+            ->controller(ClientsReservationsController::class)
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::get('/pending', 'pending')->name('pending');
+                Route::patch('/{reservation}/approve', 'approve')->name('approve');
+            });
 
         Route::middleware('role:admin|manager')->group(function () {
             Route::resource('receptionists', ReceptionistController::class)
@@ -39,7 +53,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         });
 
 
-        // Floors & Rooms — Dev 2
         Route::middleware(['auth', 'role:admin|manager'])->group(function () {
             Route::resource('floors', \App\Http\Controllers\Dashboard\FloorController::class)
                 ->except(['show']);
@@ -48,12 +61,50 @@ Route::middleware(['auth', 'verified'])->group(function () {
         });
     });
 
-    Route::inertia('dashboard/manage-clients', 'Dashboard/ManageClients/index')
-        ->name('dashboard.manage-clients');
 
-    Route::middleware('role:manager|admin')->get('dashboard/clients/export', [ClientsController::class, 'export'])
-        ->name('dashboard.clients.export');
+     // ── Admin & Manager: Full Client CRUD ─────────────────────────────────
+        // Route: /dashboard/clients
+        Route::middleware('role:admin|manager')
+            ->prefix('dashboard/clients')
+            ->name('dashboard.clients.')
+            ->group(function () {
+                Route::get('/', [ClientsController::class, 'index'])->name('index');
+                Route::get('pending', [ClientsController::class, 'pending'])->name('pending');
+                Route::get('my-approved', [ClientsController::class, 'myApproved'])->name('my-approved');
+                Route::get('export/excel', [ClientsController::class, 'export'])->name('export');
+                Route::post('{client}/approve', [ClientsController::class, 'approve'])->name('approve');
+                Route::patch('{client}/unapprove', [ClientsController::class, 'unapprove'])->name('unapprove');
+                Route::get('create', [ClientsController::class, 'create'])->name('create');
+                Route::post('/', [ClientsController::class, 'store'])->name('store');
+                Route::get('{client}/edit', [ClientsController::class, 'edit'])->name('edit');
+                Route::put('{client}', [ClientsController::class, 'update'])->name('update');
+                Route::delete('{client}', [ClientsController::class, 'destroy'])->name('destroy');
+                // wildcard last
+                Route::get('{client}', [ClientsController::class, 'show'])->name('show');
+            });
+
+        // ── Receptionist: Limited Client Access ───────────────────────────────
+        // Route: /dashboard/receptionist/clients
+        Route::middleware('role:receptionist')
+            ->prefix('dashboard/receptionist/clients')
+            ->name('receptionist.clients.')
+            ->group(function () {
+                // "Manage Clients" → unapproved clients list
+                Route::get('/', [ReceptionistClientController::class, 'index'])
+                    ->name('index');
+
+                // Approve a client
+                Route::post('{client}/approve', [ReceptionistClientController::class, 'approve'])
+                    ->name('approve');
+
+                // "My Approved Clients" tab/page
+                Route::get('my-approved', [ReceptionistClientController::class, 'myApproved'])
+                    ->name('my-approved');
+            });
+
 });
+
+
 
 Route::prefix('client')
     ->name('client.')
@@ -103,14 +154,22 @@ Route::prefix('client')
             // Client pages
             Route::get('dashboard', [ClientDashboardController::class, 'index'])
                 ->name('dashboard');
+            Route::get('profile', [ProfileController::class, 'edit'])
+                ->name('profile.edit');
+            Route::patch('profile', [ProfileController::class, 'update'])
+                ->name('profile.update');
             Route::get('reservations', [ReservationController::class, 'index'])
                 ->name('reservations.index');
             Route::get('reservations/rooms/{room}', [ReservationController::class, 'show'])
                 ->name('reservations.show');
+            Route::post('reservations/rooms/{room}/payment-intent', [ReservationController::class, 'createPaymentIntent'])
+                ->name('reservations.payment-intent');
             Route::post('reservations/rooms/{room}', [ReservationController::class, 'store'])
                 ->name('reservations.store');
-        });
+            Route::get('my-reservations', [ReservationController::class, 'myReservations'])
+                ->name('reservations.my');
     });
+});
 
 
 Route::middleware(['auth', 'verified'])->group(function () {

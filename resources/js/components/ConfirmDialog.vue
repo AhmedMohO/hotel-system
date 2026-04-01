@@ -76,11 +76,17 @@ async function confirm() {
         preserveState: false,
         onSuccess: (page) => {
             const flash = (page.props as any).flash;
+
             if (flash?.error) {
                 toast.error(flash.error);
             } else {
-                toast.success(flash?.success ?? `${props.title?.replace('?', '') ?? 'Action'} completed successfully!`);
+                toast.success(
+                    flash?.success ??
+                        props.successMessage ??
+                        `${props.title?.replace('?', '') ?? 'Action'} completed successfully!`,
+                );
             }
+
             emit('success');
             open.value = false;
         },
@@ -107,7 +113,10 @@ async function confirm() {
                                     size="icon"
                                     :class="['h-8 w-8', triggerClass]"
                                 >
-                                    <component :is="triggerIcon" class="h-4 w-4" />
+                                    <component
+                                        :is="triggerIcon"
+                                        class="h-4 w-4"
+                                    />
                                 </Button>
                             </AlertDialogTrigger>
                         </TooltipTrigger>
@@ -119,13 +128,20 @@ async function confirm() {
             </template>
             <template v-else>
                 <AlertDialogTrigger as-child>
-                    <Button :variant="triggerVariant ?? 'destructive'" size="sm" :class="triggerClass">
+                    <Button
+                        :variant="triggerVariant ?? 'destructive'"
+                        size="sm"
+                        :class="triggerClass"
+                    >
                         {{ triggerLabel ?? 'Delete' }}
                     </Button>
                 </AlertDialogTrigger>
             </template>
         </slot>
-        <AlertDialogContent @interact-outside="open = false" @escape-key-down="open = false">
+        <AlertDialogContent
+            @interact-outside="open = false"
+            @escape-key-down="open = false"
+        >
             <AlertDialogHeader>
                 <AlertDialogTitle>{{
                     title ?? 'Are you absolutely sure?'

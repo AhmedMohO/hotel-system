@@ -3,28 +3,32 @@
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
-use App\Models\Room;
+use App\Services\ReservationAvailabilityService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class ClientDashboardController extends Controller
 {
-    public function index(Request $request)
+    public function __construct(private readonly ReservationAvailabilityService $availabilityService)
     {
-        $checkIn  = $request->query('check_in',  now()->toDateString());
-        $checkOut = $request->query('check_out', now()->addDay()->toDateString());
-
-        $availableRooms = Room::whereDoesntHave('reservations', function ($query) use ($checkIn, $checkOut) {
-            $query->where('check_in',  '<', $checkOut)
-                ->where('check_out', '>',  $checkIn);
-        })->with('floor')->paginate(10);
-
-        return Inertia::render('Client/Dashboard', [
-            'rooms'    => $availableRooms,
-            'checkIn'  => $checkIn,
-            'checkOut' => $checkOut,
-        ]);
     }
 
+    public function index(Request $request)
+    {
+        $checkIn = $request->query('check_in', now()->toDateString());
+        $checkOut = $request->query('check_out', now()->addDay()->toDateString());
+        $accompanyNumber = max(1, (int) $request->query('accompany_number', 1));
 
+        $availableRooms = $this->availabilityService
+            ->availableRoomsQuery($checkIn, $checkOut, $accompanyNumber)
+            ->paginate(10)
+            ->withQueryString();
+
+        return Inertia::render('Client/Dashboard', [
+            'rooms' => $availableRooms,
+            'checkIn' => $checkIn,
+            'checkOut' => $checkOut,
+            'accompanyNumber' => $accompanyNumber,
+        ]);
+    }
 }

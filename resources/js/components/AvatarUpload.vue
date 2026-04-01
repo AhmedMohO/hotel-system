@@ -17,20 +17,34 @@ const emit = defineEmits<{
 
 const preview = ref<string | null>(null);
 const inputRef = ref<HTMLInputElement | null>(null);
+const localError = ref<string | null>(null);
+
+function resolveAvatarUrl(value?: string | null): string {
+    if (!value) {
+        return '/images/avatar.jpg';
+    }
+
+    if (
+        value.startsWith('http') ||
+        value.startsWith('/') ||
+        value.startsWith('data:')
+    ) {
+        return value;
+    }
+
+    if (value.startsWith('storage/')) {
+        return `/${value}`;
+    }
+
+    return `/storage/${value}`;
+}
 
 // Set initial preview from current avatar
 watch(
     () => props.currentAvatar,
     (val) => {
         if (!props.removed) {
-            if (val) {
-                preview.value =
-                    val.startsWith('http') || val.startsWith('/')
-                        ? val
-                        : `/storage/${val}`;
-            } else {
-                preview.value = '/images/avatar.jpg';
-            }
+            preview.value = resolveAvatarUrl(val);
         }
     },
     { immediate: true },
@@ -39,15 +53,36 @@ watch(
 function onFileChange(event: Event) {
     const target = event.target as HTMLInputElement;
     const file = target.files?.[0] ?? null;
-    emit('update:modelValue', file);
+
+    localError.value = null;
 
     if (file) {
+        if (
+            !['image/jpeg', 'image/jpg'].includes(file.type) &&
+            !file.name.match(/\.(jpg|jpeg)$/i)
+        ) {
+            target.value = '';
+            localError.value = 'Only JPG/JPEG format is allowed.';
+
+            return;
+        }
+
+        if (file.size > 2 * 1024 * 1024) {
+            target.value = '';
+            localError.value = 'Avatar must not exceed 2MB.';
+
+            return;
+        }
+
+        emit('update:modelValue', file);
         emit('update:removed', false);
         const reader = new FileReader();
         reader.onload = (e) => {
             preview.value = e.target?.result as string;
         };
         reader.readAsDataURL(file);
+    } else {
+        emit('update:modelValue', null);
     }
 }
 
@@ -106,7 +141,9 @@ function removeAvatar() {
             @change="onFileChange"
         />
         <div class="text-center">
-            <p v-if="error" class="text-xs text-destructive">{{ error }}</p>
+            <p v-if="error || localError" class="text-xs text-destructive">
+                {{ error || localError }}
+            </p>
             <p v-else class="text-xs text-muted-foreground">
                 JPG/JPEG · Max 2MB
             </p>

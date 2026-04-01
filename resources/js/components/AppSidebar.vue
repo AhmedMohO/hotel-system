@@ -8,6 +8,7 @@ import {
     ShieldCheck,
     Building2,
     BedDouble,
+    ClipboardList,
 } from 'lucide-vue-next';
 import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
@@ -22,11 +23,12 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarSeparator,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import * as Floors from '@/routes/floors';
 import * as Managers from '@/routes/managers';
 import * as Receptionists from '@/routes/receptionists';
-import * as Floors from '@/routes/floors';
 import * as Rooms from '@/routes/rooms';
 import type { NavItem } from '@/types';
 
@@ -34,11 +36,18 @@ const page = usePage<{ auth: { user: { roles: string[] } } }>();
 const roles = computed(() => page.props.auth.user?.roles ?? []);
 const isAdmin = computed(() => roles.value.includes('admin'));
 const isManager = computed(() => roles.value.includes('manager'));
+const isReceptionist = computed(() => roles.value.includes('receptionist'));
 
 const mainNavItems = computed<NavItem[]>(() => {
-    const items: NavItem[] = [
-        { title: 'Dashboard', href: dashboard(), icon: LayoutDashboard },
-    ];
+    const items: NavItem[] = [];
+
+    if (!isReceptionist.value) {
+        items.push({
+            title: 'Dashboard',
+            href: dashboard(),
+            icon: LayoutDashboard,
+        });
+    }
 
     if (isAdmin.value) {
         items.push({
@@ -68,11 +77,25 @@ const mainNavItems = computed<NavItem[]>(() => {
         });
     }
 
-    items.push({
-        title: 'Manage Clients',
-        href: '/dashboard/manage-clients',
-        icon: UserRound,
-    });
+    items.push(
+        {
+            title: 'Manage Clients',
+            href: isReceptionist.value
+                ? '/dashboard/receptionist/clients'
+                : '/dashboard/clients',
+            icon: UserRound,
+        },
+        {
+            title: 'Clients Reservations',
+            href: '/dashboard/clients-reservations',
+            icon: ClipboardList,
+        },
+        {
+            title: 'Pending Reservations',
+            href: '/dashboard/clients-reservations/pending',
+            icon: ClipboardList,
+        },
+    );
 
     return items;
 });
@@ -84,11 +107,23 @@ const footerNavItems: NavItem[] = [
 
 <template>
     <Sidebar collapsible="icon" variant="inset">
-        <SidebarHeader>
+        <!-- Header: Logo -->
+        <SidebarHeader class="border-b border-border/60 px-3 py-3">
             <SidebarMenu>
                 <SidebarMenuItem>
-                    <SidebarMenuButton size="lg" as-child>
-                        <Link :href="dashboard()">
+                    <SidebarMenuButton
+                        size="lg"
+                        as-child
+                        class="rounded-md hover:bg-accent"
+                    >
+                        <Link
+                            :href="
+                                isReceptionist
+                                    ? '/dashboard/receptionist/clients'
+                                    : dashboard()
+                            "
+                            class="flex items-center gap-2.5"
+                        >
                             <AppLogo />
                         </Link>
                     </SidebarMenuButton>
@@ -96,14 +131,18 @@ const footerNavItems: NavItem[] = [
             </SidebarMenu>
         </SidebarHeader>
 
-        <SidebarContent>
+        <!-- Main Navigation -->
+        <SidebarContent class="overflow-x-hidden">
             <NavMain :items="mainNavItems" />
         </SidebarContent>
 
-        <SidebarFooter>
+        <!-- Footer: Profile + User -->
+        <SidebarFooter class="border-t border-border/60">
             <NavFooter :items="footerNavItems" />
+            <SidebarSeparator class="opacity-50" />
             <NavUser />
         </SidebarFooter>
     </Sidebar>
+
     <slot />
 </template>
