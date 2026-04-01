@@ -103,15 +103,15 @@ const columns: ColumnDef<Client, any>[] = [
         cell: ({ row }) =>
             row.original.approved_at
                 ? h('span', {
-                      class: 'inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary ring-1 ring-primary/20 ring-inset',
+                      class: 'inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-200 ring-inset dark:bg-emerald-950/60 dark:text-emerald-400 dark:ring-emerald-800',
                   }, [
-                      h('span', { class: 'h-1.5 w-1.5 rounded-full bg-primary' }),
+                      h('span', { class: 'h-1.5 w-1.5 rounded-full bg-emerald-500' }),
                       'Approved',
                   ])
                 : h('span', {
-                      class: 'inline-flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-1 text-xs font-semibold text-muted-foreground ring-1 ring-border ring-inset',
+                      class: 'inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-700 ring-1 ring-amber-200 ring-inset dark:bg-amber-950/60 dark:text-amber-400 dark:ring-amber-800',
                   }, [
-                      h('span', { class: 'h-1.5 w-1.5 animate-pulse rounded-full bg-muted-foreground' }),
+                      h('span', { class: 'h-1.5 w-1.5 animate-pulse rounded-full bg-amber-400' }),
                       'Pending',
                   ]),
     },

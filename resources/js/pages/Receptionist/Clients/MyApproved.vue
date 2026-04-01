@@ -86,11 +86,11 @@ const columns: ColumnDef<Client, any>[] = [
                     h(
                         'span',
                         {
-                            class: 'inline-flex items-center gap-1 text-xs font-medium text-primary',
+                            class: 'inline-flex items-center gap-1 text-xs font-medium text-emerald-500 dark:text-emerald-400',
                         },
                         [
                             h('span', {
-                                class: 'h-1.5 w-1.5 rounded-full bg-primary',
+                                class: 'h-1.5 w-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400',
                             }),
                             'Approved',
                         ],
@@ -188,9 +188,7 @@ const columns: ColumnDef<Client, any>[] = [
                         </svg>
                     </Link>
                     <div>
-                        <h1
-                            class="text-2xl font-bold tracking-tight text-foreground"
-                        >
+                        <h1 class="text-2xl font-bold tracking-tight text-foreground">
                             {{
                                 isReceptionist
                                     ? 'My Approved Clients'
@@ -207,9 +205,7 @@ const columns: ColumnDef<Client, any>[] = [
                 </div>
 
                 <!-- DataTable -->
-                <div
-                    class="rounded-2xl border border-border bg-card p-4 shadow-sm"
-                >
+                <div class="rounded-2xl border border-border bg-card p-4 shadow-sm">
                     <DataTable
                         :data="clients"
                         :columns="columns"
