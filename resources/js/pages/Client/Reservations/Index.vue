@@ -8,12 +8,13 @@ import {
     useVueTable,
     type ColumnDef,
 } from '@tanstack/vue-table';
-import { computed, reactive } from 'vue';
+import { computed, h, reactive } from 'vue';
 import ClientNavbarLayout from '@/layouts/ClientNavbarLayout.vue';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
 import {
     Table,
     TableBody,
@@ -22,10 +23,9 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { Search, BedDouble, Users, DollarSign } from 'lucide-vue-next';
 
-defineOptions({
-    layout: ClientNavbarLayout,
-});
+defineOptions({ layout: ClientNavbarLayout });
 
 type Room = {
     id: number;
@@ -66,25 +66,24 @@ function reserveHref(roomId: number): string {
         check_out: filters.check_out,
         accompany_number: filters.accompany_number,
     });
-
     return `/client/reservations/rooms/${roomId}?${params.toString()}`;
 }
 
 const columns: ColumnDef<Room>[] = [
     {
         accessorKey: 'number',
-        header: 'Room Number',
+        header: 'Room',
         cell: ({ row }) => row.original.number,
     },
     {
         id: 'floor',
         header: 'Floor',
-        cell: ({ row }) => row.original.floor?.name ?? '-',
+        cell: ({ row }) => row.original.floor?.name ?? '—',
     },
     {
         accessorKey: 'capacity',
         header: 'Capacity',
-        cell: ({ row }) => row.original.capacity,
+        cell: ({ row }) => `${row.original.capacity} guests`,
     },
     {
         accessorKey: 'price_formatted',
@@ -93,25 +92,17 @@ const columns: ColumnDef<Room>[] = [
     },
     {
         id: 'action',
-        header: 'Action',
+        header: '',
         cell: ({ row }) => row.original.id,
     },
 ];
 
 const table = useVueTable({
-    get data() {
-        return props.rooms;
-    },
-    get columns() {
-        return columns;
-    },
+    get data() { return props.rooms; },
+    get columns() { return columns; },
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    initialState: {
-        pagination: {
-            pageSize: 10,
-        },
-    },
+    initialState: { pagination: { pageSize: 10 } },
 });
 
 function searchAvailableRooms() {
@@ -125,9 +116,7 @@ function searchAvailableRooms() {
         {
             preserveState: true,
             replace: true,
-            onSuccess: () => {
-                table.setPageIndex(0);
-            },
+            onSuccess: () => { table.setPageIndex(0); },
         },
     );
 }
@@ -137,53 +126,86 @@ function searchAvailableRooms() {
     <Head title="Available Rooms" />
 
     <div class="mx-auto w-full max-w-6xl space-y-6 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+
+        <!-- Search Card -->
         <Card>
             <CardHeader>
-                <CardTitle>Find Available Rooms</CardTitle>
+                <CardTitle>Find available rooms</CardTitle>
+                <CardDescription>Enter your stay details to see what's available</CardDescription>
             </CardHeader>
             <CardContent>
                 <form class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" @submit.prevent="searchAvailableRooms">
                     <div class="space-y-2">
-                        <Label for="check-in" class="text-sm">Check-in</Label>
+                        <Label for="check-in" class="text-sm">Check-in date</Label>
                         <Input id="check-in" v-model="filters.check_in" type="date" required />
                         <InputError :message="errors.check_in" />
                     </div>
 
                     <div class="space-y-2">
-                        <Label for="check-out" class="text-sm">Check-out</Label>
+                        <Label for="check-out" class="text-sm">Check-out date</Label>
                         <Input id="check-out" v-model="filters.check_out" type="date" required />
                         <InputError :message="errors.check_out" />
                     </div>
 
                     <div class="space-y-2">
-                        <Label for="accompany" class="text-sm">Accompany Number</Label>
+                        <Label for="accompany" class="text-sm">Number of guests</Label>
                         <Input id="accompany" v-model="filters.accompany_number" type="number" min="1" required />
                         <InputError :message="errors.accompany_number" />
                     </div>
 
                     <div class="flex items-end sm:col-span-2 lg:col-span-1">
-                        <Button class="w-full" type="submit">Search</Button>
+                        <Button class="w-full gap-2" type="submit">
+                            <Search class="w-4 h-4" />
+                            Search
+                        </Button>
                     </div>
                 </form>
             </CardContent>
         </Card>
 
+        <!-- Results Card -->
         <Card>
-            <CardHeader>
-                <CardTitle>Available Rooms</CardTitle>
+            <CardHeader class="flex flex-row items-center justify-between">
+                <div>
+                    <CardTitle>Available rooms</CardTitle>
+                    <CardDescription v-if="hasSearchInputs && rooms.length > 0">
+                        {{ rooms.length }} room{{ rooms.length !== 1 ? 's' : '' }} found
+                    </CardDescription>
+                </div>
             </CardHeader>
             <CardContent>
-                <div class="overflow-x-auto rounded-md border">
+
+                <!-- Empty state -->
+                <div v-if="table.getRowModel().rows.length === 0" class="flex flex-col items-center justify-center py-16 gap-3 text-center">
+                    <BedDouble class="w-10 h-10 text-muted-foreground/50" />
+                    <p class="font-medium text-foreground">
+                        {{ hasSearchInputs ? 'No rooms available' : 'Search to see rooms' }}
+                    </p>
+                    <p class="text-sm text-muted-foreground max-w-xs">
+                        {{ hasSearchInputs ? 'Try different dates or fewer guests.' : 'Enter your check-in, check-out dates and number of guests above.' }}
+                    </p>
+                </div>
+
+                <!-- Table -->
+                <div v-else class="overflow-x-auto rounded-md border">
                     <Table>
                         <TableHeader>
                             <TableRow v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
-                                <TableHead v-for="header in headerGroup.headers" :key="header.id" :class="header.id === 'action' ? 'text-right' : ''">
-                                    <FlexRender v-if="!header.isPlaceholder" :render="header.column.columnDef.header" :props="header.getContext()" />
+                                <TableHead
+                                    v-for="header in headerGroup.headers"
+                                    :key="header.id"
+                                    :class="header.id === 'action' ? 'text-right w-24' : ''"
+                                >
+                                    <FlexRender
+                                        v-if="!header.isPlaceholder"
+                                        :render="header.column.columnDef.header"
+                                        :props="header.getContext()"
+                                    />
                                 </TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            <TableRow v-for="row in table.getRowModel().rows" :key="row.id">
+                            <TableRow v-for="row in table.getRowModel().rows" :key="row.id" class="hover:bg-muted/50">
                                 <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id" :class="cell.column.id === 'action' ? 'text-right' : ''">
                                     <a v-if="cell.column.id === 'action'" :href="reserveHref(row.original.id)">
                                         <Button size="sm">Reserve</Button>
@@ -191,21 +213,15 @@ function searchAvailableRooms() {
                                     <FlexRender v-else :render="cell.column.columnDef.cell" :props="cell.getContext()" />
                                 </TableCell>
                             </TableRow>
-
-                            <TableRow v-if="table.getRowModel().rows.length === 0">
-                                <TableCell colspan="5" class="h-20 text-center text-muted-foreground">
-                                    {{ hasSearchInputs ? 'No rooms available for this date range.' : 'Select dates to start searching.' }}
-                                </TableCell>
-                            </TableRow>
                         </TableBody>
                     </Table>
                 </div>
 
-                <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <!-- Pagination -->
+                <div v-if="table.getRowModel().rows.length > 0" class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <p class="text-sm text-muted-foreground">
                         Page {{ table.getState().pagination.pageIndex + 1 }} of {{ Math.max(table.getPageCount(), 1) }}
                     </p>
-
                     <div class="flex items-center gap-2">
                         <label for="page-size" class="text-sm text-muted-foreground">Rows</label>
                         <select
@@ -219,17 +235,12 @@ function searchAvailableRooms() {
                             <option value="20">20</option>
                             <option value="50">50</option>
                         </select>
-
-                        <Button size="sm" variant="outline" :disabled="!table.getCanPreviousPage()" @click="table.previousPage()">
-                            Previous
-                        </Button>
-                        <Button size="sm" variant="outline" :disabled="!table.getCanNextPage()" @click="table.nextPage()">
-                            Next
-                        </Button>
+                        <Button size="sm" variant="outline" :disabled="!table.getCanPreviousPage()" @click="table.previousPage()">Previous</Button>
+                        <Button size="sm" variant="outline" :disabled="!table.getCanNextPage()" @click="table.nextPage()">Next</Button>
                     </div>
                 </div>
+
             </CardContent>
         </Card>
     </div>
 </template>
-

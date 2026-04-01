@@ -2,16 +2,15 @@
 import AvatarUpload from '@/components/AvatarUpload.vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import ClientNavbarLayout from '@/layouts/ClientNavbarLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import { toast } from 'vue-sonner';
+import { ArrowLeft } from 'lucide-vue-next';
 
-defineOptions({
-    layout: ClientNavbarLayout,
-});
+defineOptions({ layout: ClientNavbarLayout });
 
 type ClientProfile = {
     id: number;
@@ -60,41 +59,54 @@ function submit() {
     <Head title="Edit Profile" />
 
     <div class="mx-auto w-full max-w-4xl space-y-6 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-        <Card>
-            <CardHeader>
-                <CardTitle>Client Profile</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <form class="space-y-6" @submit.prevent="submit">
-                    <div class="space-y-3">
-                        <Label>Avatar</Label>
-                        <AvatarUpload
-                            v-model="form.avatar_image"
-                            v-model:removed="form.remove_avatar"
-                            :current-avatar="client.avatar_image"
-                            :error="form.errors.avatar_image"
-                        />
-                    </div>
 
+        <!-- Back link -->
+        <a href="/client/dashboard" class="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <ArrowLeft class="w-4 h-4" />
+            Back to dashboard
+        </a>
+
+        <form class="space-y-6" @submit.prevent="submit">
+
+            <!-- Avatar -->
+            <Card>
+                <CardHeader>
+                    <CardTitle>Profile picture</CardTitle>
+                    <CardDescription>Upload a photo to personalize your account</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <AvatarUpload
+                        v-model="form.avatar_image"
+                        v-model:removed="form.remove_avatar"
+                        :current-avatar="client.avatar_image"
+                        :error="form.errors.avatar_image"
+                    />
+                </CardContent>
+            </Card>
+
+            <!-- Personal Info -->
+            <Card>
+                <CardHeader>
+                    <CardTitle>Personal information</CardTitle>
+                    <CardDescription>Update your name, contact details, and location</CardDescription>
+                </CardHeader>
+                <CardContent class="space-y-5">
                     <div class="grid gap-4 sm:grid-cols-2">
                         <div class="space-y-2">
-                            <Label for="name">Name</Label>
+                            <Label for="name">Full name</Label>
                             <Input id="name" v-model="form.name" type="text" required />
                             <InputError :message="form.errors.name" />
                         </div>
-
                         <div class="space-y-2">
-                            <Label for="email">Email</Label>
+                            <Label for="email">Email address</Label>
                             <Input id="email" v-model="form.email" type="email" required />
                             <InputError :message="form.errors.email" />
                         </div>
-
                         <div class="space-y-2">
-                            <Label for="mobile">Mobile</Label>
+                            <Label for="mobile">Mobile number</Label>
                             <Input id="mobile" v-model="form.mobile" type="text" required />
                             <InputError :message="form.errors.mobile" />
                         </div>
-
                         <div class="space-y-2">
                             <Label for="country">Country</Label>
                             <Input id="country" v-model="form.country" type="text" required />
@@ -115,33 +127,37 @@ function submit() {
                         </select>
                         <InputError :message="form.errors.gender" />
                     </div>
+                </CardContent>
+            </Card>
 
+            <!-- Password -->
+            <Card>
+                <CardHeader>
+                    <CardTitle>Change password</CardTitle>
+                    <CardDescription>Leave blank to keep your current password</CardDescription>
+                </CardHeader>
+                <CardContent>
                     <div class="grid gap-4 sm:grid-cols-2">
                         <div class="space-y-2">
-                            <Label for="password">New Password (optional)</Label>
-                            <Input id="password" v-model="form.password" type="password" />
+                            <Label for="password">New password</Label>
+                            <Input id="password" v-model="form.password" type="password" autocomplete="new-password" />
                             <InputError :message="form.errors.password" />
                         </div>
-
                         <div class="space-y-2">
-                            <Label for="password_confirmation">Confirm Password</Label>
-                            <Input
-                                id="password_confirmation"
-                                v-model="form.password_confirmation"
-                                type="password"
-                            />
+                            <Label for="password_confirmation">Confirm new password</Label>
+                            <Input id="password_confirmation" v-model="form.password_confirmation" type="password" autocomplete="new-password" />
                         </div>
                     </div>
+                </CardContent>
+            </Card>
 
-                    <div class="flex justify-end">
-                        <Button type="submit" :disabled="form.processing">
-                            {{ form.processing ? 'Saving...' : 'Save Changes' }}
-                        </Button>
-                    </div>
-                </form>
-            </CardContent>
-        </Card>
+            <!-- Save -->
+            <div class="flex justify-end">
+                <Button type="submit" :disabled="form.processing" class="min-w-32">
+                    {{ form.processing ? 'Saving...' : 'Save changes' }}
+                </Button>
+            </div>
+
+        </form>
     </div>
 </template>
-
-
