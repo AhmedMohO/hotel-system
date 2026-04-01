@@ -1,169 +1,21 @@
-<template>
-    <AppLayout>
-        <div class="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
-            <div class="mb-8 flex items-center gap-4">
-                <Link
-                    href="/dashboard/clients"
-                    class="rounded-xl border border-transparent p-2 text-slate-500 transition-all hover:border-slate-200 hover:bg-white hover:text-slate-800"
-                >
-                    <svg
-                        class="h-5 w-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M15 19l-7-7 7-7"
-                        />
-                    </svg>
-                </Link>
-                <h1 class="text-2xl font-bold tracking-tight text-foreground">
-                    Edit Client Profile
-                </h1>
-            </div>
-
-            <form
-                @submit.prevent="submit"
-                class="overflow-hidden rounded-2xl border border-slate-200 bg-card shadow-sm"
-            >
-                <div class="px-8 pt-14 pb-8">
-                    <div class="mb-8">
-                        <h2 class="text-lg font-bold text-foreground">
-                            Personal Information
-                        </h2>
-                        <p class="text-sm text-slate-500">
-                            Update the client details and contact information.
-                        </p>
-                    </div>
-
-                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                        <div class="sm:col-span-2">
-                            <label
-                                class="mb-1.5 block text-xs font-medium tracking-wider text-slate-400 uppercase"
-                                >Full Name</label
-                            >
-                            <input
-                                v-model="form.name"
-                                type="text"
-                                class="w-full rounded-xl border bg-slate-50 px-4 py-2.5 text-sm font-semibold text-slate-800 transition focus:border-slate-400 focus:bg-white focus:ring-4 focus:ring-slate-100 focus:outline-none"
-                                :class="
-                                    form.errors.name
-                                        ? 'border-red-400 ring-red-50'
-                                        : 'border-slate-100'
-                                "
-                            />
-                            <p
-                                v-if="form.errors.name"
-                                class="mt-1 text-xs text-red-500"
-                            >
-                                {{ form.errors.name }}
-                            </p>
-                        </div>
-
-                        <div class="sm:col-span-2">
-                            <label
-                                class="mb-1.5 block text-xs font-medium tracking-wider text-slate-400 uppercase"
-                                >Email Address</label
-                            >
-                            <input
-                                v-model="form.email"
-                                type="email"
-                                class="w-full rounded-xl border bg-slate-50 px-4 py-2.5 text-sm font-semibold text-slate-800 transition focus:border-slate-400 focus:bg-white focus:ring-4 focus:ring-slate-100 focus:outline-none"
-                                :class="
-                                    form.errors.email
-                                        ? 'border-red-400 ring-red-50'
-                                        : 'border-slate-100'
-                                "
-                            />
-                            <p
-                                v-if="form.errors.email"
-                                class="mt-1 text-xs text-red-500"
-                            >
-                                {{ form.errors.email }}
-                            </p>
-                        </div>
-
-                        <div>
-                            <label
-                                class="mb-1.5 block text-xs font-medium tracking-wider text-slate-400 uppercase"
-                                >Mobile</label
-                            >
-                            <input
-                                v-model="form.mobile"
-                                type="text"
-                                class="w-full rounded-xl border bg-slate-50 px-4 py-2.5 text-sm font-semibold text-slate-800 transition focus:border-slate-400 focus:bg-white focus:ring-4 focus:ring-slate-100 focus:outline-none"
-                                :class="
-                                    form.errors.mobile
-                                        ? 'border-red-400 ring-red-50'
-                                        : 'border-slate-100'
-                                "
-                            />
-                        </div>
-
-                        <div>
-                            <label
-                                class="mb-1.5 block text-xs font-medium tracking-wider text-slate-400 uppercase"
-                                >Country</label
-                            >
-                            <CountrySelect
-                                v-model="form.country"
-                                :countries="countries"
-                            />
-                        </div>
-
-                        <div>
-                            <label
-                                class="mb-1.5 block text-xs font-medium tracking-wider text-slate-400 uppercase"
-                                >Gender</label
-                            >
-                            <select
-                                v-model="form.gender"
-                                class="w-full rounded-xl border bg-slate-50 px-4 py-2.5 text-sm font-semibold text-slate-800 transition focus:border-slate-400 focus:bg-white focus:ring-4 focus:ring-slate-100 focus:outline-none"
-                                :class="
-                                    form.errors.gender
-                                        ? 'border-red-400 ring-red-50'
-                                        : 'border-slate-100'
-                                "
-                            >
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div
-                        class="mt-10 flex items-center justify-end gap-3 border-t border-slate-100 pt-8"
-                    >
-                        <Link
-                            href="/dashboard/clients"
-                            class="rounded-xl bg-slate-100 px-6 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-200"
-                        >
-                            Cancel
-                        </Link>
-                        <button
-                            type="submit"
-                            :disabled="form.processing"
-                            class="rounded-xl bg-primary px-8 py-2.5 text-sm font-semibold text-white transition-all hover:bg-primary/80 hover:shadow-lg active:scale-95 disabled:bg-slate-400"
-                        >
-                            {{ form.processing ? 'Saving...' : 'Save Changes' }}
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </AppLayout>
-</template>
-
 <script setup>
 import { Link, useForm } from '@inertiajs/vue3';
 import { toast } from 'vue-sonner';
 import CountrySelect from '@/components/CountrySelect.vue';
+import InputError from '@/components/InputError.vue';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/AppLayout.vue';
 
 const props = defineProps({ client: Object, countries: Array });
+
+const breadcrumbs = [
+    { title: 'Dashboard', href: '/dashboard' },
+    { title: 'Clients', href: '/dashboard/clients' },
+    { title: 'Edit Client', href: '' },
+];
 
 const form = useForm({
     name: props.client.name,
@@ -178,8 +30,96 @@ function submit() {
     form.post(`/dashboard/clients/${props.client.id}`, {
         preserveScroll: true,
         onSuccess: () => toast.success('Client updated successfully.'),
-        onError: () =>
-            toast.error('Failed to update client. Please check the form.'),
+        onError: () => toast.error('Failed to update client. Please check the form.'),
     });
 }
 </script>
+
+<template>
+    <AppLayout :breadcrumbs="breadcrumbs">
+        <div class="p-6">
+            <div class="mx-auto max-w-2xl overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+
+                <!-- Card Header -->
+                <div class="px-6 pt-6 pb-4">
+                    <h1 class="text-base font-semibold">Edit Client</h1>
+                    <p class="mt-0.5 text-sm text-muted-foreground">
+                        Updating profile for <span class="font-medium text-foreground">{{ client.name }}</span>.
+                    </p>
+                </div>
+
+                <Separator />
+
+                <form class="flex flex-col gap-4 px-6 py-5" @submit.prevent="submit">
+
+                    <!-- Name -->
+                    <div class="grid gap-1.5">
+                        <Label for="name" class="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                            Full Name
+                        </Label>
+                        <Input id="name" v-model="form.name" type="text" />
+                        <InputError :message="form.errors.name" />
+                    </div>
+
+                    <!-- Email -->
+                    <div class="grid gap-1.5">
+                        <Label for="email" class="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                            Email Address
+                        </Label>
+                        <Input id="email" v-model="form.email" type="email" />
+                        <InputError :message="form.errors.email" />
+                    </div>
+
+                    <!-- Mobile & Country -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="grid gap-1.5">
+                            <Label for="mobile" class="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                                Mobile
+                            </Label>
+                            <Input id="mobile" v-model="form.mobile" type="text" />
+                            <InputError :message="form.errors.mobile" />
+                        </div>
+
+                        <div class="grid gap-1.5">
+                            <Label class="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                                Country
+                            </Label>
+                            <CountrySelect v-model="form.country" :countries="countries" />
+                        </div>
+                    </div>
+
+                    <!-- Gender -->
+                    <div class="grid gap-1.5">
+                        <Label class="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                            Gender
+                        </Label>
+                        <select
+                            v-model="form.gender"
+                            class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
+                        >
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                        <InputError :message="form.errors.gender" />
+                    </div>
+
+                    <Separator />
+
+                    <!-- Footer -->
+                    <div class="flex justify-end gap-2">
+                        <Button type="button" variant="outline" size="sm" as-child>
+                            <Link href="/dashboard/clients">Cancel</Link>
+                        </Button>
+                        <Button type="submit" size="sm" :disabled="form.processing">
+                            <span
+                                v-if="form.processing"
+                                class="mr-1.5 h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent"
+                            />
+                            Save Changes
+                        </Button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </AppLayout>
+</template>

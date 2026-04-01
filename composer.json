@@ -19,6 +19,7 @@
         "laravel/wayfinder": "^0.1.14",
         "maatwebsite/excel": "^3.1",
         "monarobase/country-list": "*",
+        "nnjeim/world": "^1.1",
         "spatie/laravel-permission": "*",
         "spatie/laravel-query-builder": "^7.0",
         "stripe/stripe-php": "^19.4"
