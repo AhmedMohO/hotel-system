@@ -1,10 +1,21 @@
 <script setup lang="ts">
+import { Link, usePage } from '@inertiajs/vue3';
+import {
+    Calendar,
+    ClipboardList,
+    Home,
+    LogOut,
+    Menu,
+    User,
+} from 'lucide-vue-next';
 import { computed } from 'vue';
-import { usePage } from '@inertiajs/vue3';
 import { Toaster } from 'vue-sonner';
+
 import AppContent from '@/components/AppContent.vue';
+import AppLogo from '@/components/AppLogo.vue';
 import AppShell from '@/components/AppShell.vue';
 import ClientFooter from '@/components/ClientFooter.vue';
+import ThemeSwitcher from '@/components/ThemeSwitcher.vue';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -13,19 +24,32 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { LogOut, User, Home } from 'lucide-vue-next';
-import AppLogo from '@/components/AppLogo.vue';
+import {
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
+} from '@/components/ui/sheet';
+import Client from '@/routes/client';
 
 const page = usePage();
 
 const avatarUrl = computed(() => {
-    const avatar = (page.props.auth as any)?.user?.avatar_image as string | null | undefined;
+    const avatar = (page.props.auth as any)?.user?.avatar_image as
+        | string
+        | null
+        | undefined;
 
     if (!avatar) {
         return null;
     }
 
-    if (avatar.startsWith('http') || avatar.startsWith('/') || avatar.startsWith('data:')) {
+    if (
+        avatar.startsWith('http') ||
+        avatar.startsWith('/') ||
+        avatar.startsWith('data:')
+    ) {
         return avatar;
     }
 
@@ -36,75 +60,209 @@ const avatarUrl = computed(() => {
     return `/storage/${avatar}`;
 });
 
-const userInitial = computed(() => String((page.props.auth as any)?.user?.name ?? 'U').charAt(0).toUpperCase());
+const userInitial = computed(() =>
+    String((page.props.auth as any)?.user?.name ?? 'U')
+        .charAt(0)
+        .toUpperCase(),
+);
 </script>
 
 <template>
     <AppShell variant="header">
-        <header class="bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50">
+        <header
+            class="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-md"
+        >
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between items-center h-16">
+                <div class="flex h-16 items-center justify-between">
                     <!-- Logo/Home -->
-                   <app-logo class="w-auto h-8" />
+                    <Link
+                        :href="Client.dashboard.url()"
+                        class="flex items-center gap-2 transition-opacity hover:opacity-80"
+                    >
+                        <AppLogo />
+                    </Link>
 
-                    <!-- Navigation Links -->
-                    <nav class="hidden md:flex items-center gap-8">
-                        <a href="/client/reservations" class="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium transition-colors">
+                    <!-- Desktop Navigation Links -->
+                    <nav class="hidden items-center gap-8 md:flex">
+                        <Link
+                            :href="Client.reservations.index.url()"
+                            class="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                            :class="{
+                                'text-foreground': page.url.startsWith(
+                                    Client.reservations.index.url(),
+                                ),
+                            }"
+                        >
                             Browse Rooms
-                        </a>
-                        <a href="/client/my-reservations" class="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium transition-colors">
+                        </Link>
+                        <Link
+                            :href="Client.reservations.my.url()"
+                            class="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                            :class="{
+                                'text-foreground': page.url.startsWith(
+                                    Client.reservations.my.url(),
+                                ),
+                            }"
+                        >
                             My Reservations
-                        </a>
-<!--                        <a href="/client/profile" class="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium transition-colors">-->
-<!--                            Profile-->
-<!--                        </a>-->
+                        </Link>
                     </nav>
 
-                    <!-- User Menu -->
-                    <div class="flex items-center gap-4">
+                    <!-- Right Column: Theme + User + Mobile Menu -->
+                    <div class="flex items-center gap-2 sm:gap-4">
+                        <ThemeSwitcher />
+
                         <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon" class="relative">
-                                    <div class="w-8 h-8 rounded-full overflow-hidden bg-blue-600 flex items-center justify-center text-white font-medium">
-                                        <img v-if="avatarUrl" :src="avatarUrl" alt="Profile avatar" class="h-full w-full object-cover" />
+                            <DropdownMenuTrigger as-child>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    class="relative overflow-hidden rounded-full transition-colors hover:bg-muted/50"
+                                >
+                                    <div
+                                        class="flex h-8 w-8 items-center justify-center rounded-full bg-primary font-medium text-primary-foreground ring-2 ring-primary/10"
+                                    >
+                                        <img
+                                            v-if="avatarUrl"
+                                            :src="avatarUrl"
+                                            alt="Profile avatar"
+                                            class="h-full w-full object-cover"
+                                        />
                                         <span v-else>{{ userInitial }}</span>
                                     </div>
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" class="w-56">
-                                <div class="px-2 py-1.5">
-                                    <p class="text-sm font-medium text-gray-900 dark:text-white">
+                            <DropdownMenuContent align="end" class="mt-2 w-56">
+                                <div
+                                    class="mb-1 border-b border-border/50 px-2 py-2"
+                                >
+                                    <p class="truncate text-sm font-semibold">
                                         {{ page.props.auth.user.name }}
                                     </p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                                    <p
+                                        class="truncate text-xs text-muted-foreground"
+                                    >
                                         {{ page.props.auth.user.email }}
                                     </p>
                                 </div>
-                                <DropdownMenuSeparator />
                                 <DropdownMenuItem as-child>
-                                    <a href="/client/dashboard" class="cursor-pointer flex items-center gap-2">
-                                        <Home class="w-4 h-4" />
+                                    <Link
+                                        :href="Client.dashboard.url()"
+                                        class="flex cursor-pointer items-center gap-2"
+                                    >
+                                        <Home class="h-4 w-4" />
                                         Dashboard
-                                    </a>
+                                    </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem as-child>
-                                    <a href="/client/profile" class="cursor-pointer flex items-center gap-2">
-                                        <User class="w-4 h-4" />
+                                    <Link
+                                        :href="Client.profile.edit.url()"
+                                        class="flex cursor-pointer items-center gap-2"
+                                    >
+                                        <User class="h-4 w-4" />
                                         Edit Profile
-                                    </a>
+                                    </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem as-child>
-                                    <form method="POST" action="/client/logout" class="w-full">
-                                        <input type="hidden" name="_token" :value="page.props.csrf_token" />
-                                        <button type="submit" class="w-full text-left flex items-center gap-2 text-red-600 dark:text-red-400">
-                                            <LogOut class="w-4 h-4" />
-                                            Logout
-                                        </button>
-                                    </form>
+                                    <Link
+                                        :href="Client.logout.url()"
+                                        method="post"
+                                        as="button"
+                                        class="flex w-full cursor-pointer items-center gap-2 text-destructive focus:text-destructive"
+                                    >
+                                        <LogOut class="h-4 w-4" />
+                                        Logout
+                                    </Link>
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
+
+                        <!-- Mobile Menu Button (Sheet) -->
+                        <Sheet>
+                            <SheetTrigger as-child>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    class="md:hidden"
+                                >
+                                    <Menu class="h-5 w-5" />
+                                </Button>
+                            </SheetTrigger>
+                            <SheetContent
+                                side="right"
+                                class="w-[300px] p-0 sm:w-[400px]"
+                            >
+                                <SheetHeader class="border-b p-6 text-left">
+                                    <SheetTitle class="flex items-center gap-2">
+                                        <AppLogo />
+                                    </SheetTitle>
+                                </SheetHeader>
+                                <div class="flex flex-col py-6">
+                                    <Link
+                                        :href="Client.dashboard.url()"
+                                        class="flex items-center gap-3 px-6 py-4 text-base font-medium transition-colors hover:bg-muted"
+                                        :class="{
+                                            'bg-muted text-primary':
+                                                page.url ===
+                                                Client.dashboard.url(),
+                                        }"
+                                    >
+                                        <Home class="h-5 w-5" />
+                                        Dashboard
+                                    </Link>
+                                    <Link
+                                        :href="Client.reservations.index.url()"
+                                        class="flex items-center gap-3 px-6 py-4 text-base font-medium transition-colors hover:bg-muted"
+                                        :class="{
+                                            'bg-muted text-primary':
+                                                page.url.startsWith(
+                                                    Client.reservations.index.url(),
+                                                ),
+                                        }"
+                                    >
+                                        <Calendar class="h-5 w-5" />
+                                        Browse Rooms
+                                    </Link>
+                                    <Link
+                                        :href="Client.reservations.my.url()"
+                                        class="flex items-center gap-3 px-6 py-4 text-base font-medium transition-colors hover:bg-muted"
+                                        :class="{
+                                            'bg-muted text-primary':
+                                                page.url.startsWith(
+                                                    Client.reservations.my.url(),
+                                                ),
+                                        }"
+                                    >
+                                        <ClipboardList class="h-5 w-5" />
+                                        My Reservations
+                                    </Link>
+                                    <DropdownMenuSeparator class="mx-6 my-2" />
+                                    <Link
+                                        :href="Client.profile.edit.url()"
+                                        class="flex items-center gap-3 px-6 py-4 text-base font-medium transition-colors hover:bg-muted"
+                                        :class="{
+                                            'bg-muted text-primary':
+                                                page.url.startsWith(
+                                                    Client.profile.edit.url(),
+                                                ),
+                                        }"
+                                    >
+                                        <User class="h-5 w-5" />
+                                        Profile Settings
+                                    </Link>
+                                    <Link
+                                        :href="Client.logout.url()"
+                                        method="post"
+                                        as="button"
+                                        class="flex w-full items-center gap-3 px-6 py-4 text-left text-base font-medium text-destructive transition-colors hover:bg-destructive/5"
+                                    >
+                                        <LogOut class="h-5 w-5" />
+                                        Logout
+                                    </Link>
+                                </div>
+                            </SheetContent>
+                        </Sheet>
                     </div>
                 </div>
             </div>
@@ -113,8 +271,12 @@ const userInitial = computed(() => String((page.props.auth as any)?.user?.name ?
         <AppContent variant="header">
             <slot />
             <ClientFooter />
-            <Toaster theme="system" rich-colors close-button position="top-center" />
         </AppContent>
+        <Toaster
+            theme="system"
+            rich-colors
+            close-button
+            position="top-center"
+        />
     </AppShell>
 </template>
-

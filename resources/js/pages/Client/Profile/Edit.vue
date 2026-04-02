@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import { Head, Link, useForm } from '@inertiajs/vue3';
+import { ArrowLeft } from 'lucide-vue-next';
+import { toast } from 'vue-sonner';
+
 import AvatarUpload from '@/components/AvatarUpload.vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
@@ -6,9 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import ClientNavbarLayout from '@/layouts/ClientNavbarLayout.vue';
-import { Head, useForm } from '@inertiajs/vue3';
-import { toast } from 'vue-sonner';
-import { ArrowLeft } from 'lucide-vue-next';
+import Client from '@/routes/client';
 
 defineOptions({ layout: ClientNavbarLayout });
 
@@ -61,10 +63,10 @@ function submit() {
     <div class="mx-auto w-full max-w-4xl space-y-6 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
 
         <!-- Back link -->
-        <a href="/client/dashboard" class="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
+        <Link :href="Client.dashboard.url()" class="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft class="w-4 h-4" />
             Back to dashboard
-        </a>
+        </Link>
 
         <form class="space-y-6" @submit.prevent="submit">
 

@@ -35,6 +35,7 @@
     },
     "dependencies": {
         "@inertiajs/vue3": "^2.3.7",
+        "@internationalized/date": "^3.12.0",
         "@stripe/stripe-js": "^7.7.0",
         "@tabler/icons-vue": "^3.40.0",
         "@tanstack/vue-table": "^8.21.3",

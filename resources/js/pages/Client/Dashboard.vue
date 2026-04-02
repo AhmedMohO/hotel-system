@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { Head, usePage } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import ClientNavbarLayout from '@/layouts/ClientNavbarLayout.vue';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar, ClipboardList, UserCircle, ArrowRight, CheckCircle2 } from 'lucide-vue-next';
 import { computed } from 'vue';
+import Client from '@/routes/client';
 
 defineOptions({ layout: ClientNavbarLayout });
 
@@ -61,13 +62,13 @@ const steps = [
                     Account active
                 </span>
             </div>
-            <a href="/client/reservations" class="shrink-0">
+            <Link :href="Client.reservations.index.url()" class="shrink-0">
                 <Button class="gap-2">
                     <Calendar class="w-4 h-4" />
                     Browse rooms
                     <ArrowRight class="w-4 h-4" />
                 </Button>
-            </a>
+            </Link>
         </div>
 
         <!-- Stats -->
@@ -106,12 +107,12 @@ const steps = [
                     <p class="text-sm text-muted-foreground">
                         Search available rooms and book your next stay in a few steps.
                     </p>
-                    <a href="/client/reservations">
+                    <Link :href="Client.reservations.index.url()">
                         <Button variant="outline" class="w-full gap-2">
                             <Calendar class="w-4 h-4" />
                             Browse rooms
                         </Button>
-                    </a>
+                    </Link>
                 </CardContent>
             </Card>
 
@@ -127,12 +128,12 @@ const steps = [
                     <p class="text-sm text-muted-foreground">
                         Check current and past reservations, check-in dates, and room details.
                     </p>
-                    <a href="/client/my-reservations">
+                    <Link :href="Client.reservations.my.url()">
                         <Button variant="outline" class="w-full gap-2">
                             <ClipboardList class="w-4 h-4" />
                             View bookings
                         </Button>
-                    </a>
+                    </Link>
                 </CardContent>
             </Card>
 
@@ -148,12 +149,12 @@ const steps = [
                     <p class="text-sm text-muted-foreground">
                         Update your personal information and account settings.
                     </p>
-                    <a href="/client/profile">
+                    <Link :href="Client.profile.edit.url()">
                         <Button variant="outline" class="w-full gap-2">
                             <UserCircle class="w-4 h-4" />
                             Edit profile
                         </Button>
-                    </a>
+                    </Link>
                 </CardContent>
             </Card>
         </div>
